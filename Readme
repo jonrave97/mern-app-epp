@@ -1,0 +1,4 @@
+#Instalar
+
+#Para instalar bcrypt, usa el siguiente comando:
+npm install bcrypt 
