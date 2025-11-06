@@ -1,20 +1,10 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
 
 /**
- * Interface que define la estructura de un usuario en la aplicación
- * @interface UserInterface
+ * Schema que define la estructura de un usuario en la aplicación
  * @description Define los campos requeridos para crear y manipular usuarios
  */
-interface UserInterface {
-    /** Nombre completo del usuario (2-50 caracteres) */
-    name: string;
-    /** Dirección de email única del usuario */
-    email: string;
-    /** Contraseña del usuario (8-100 caracteres, case-sensitive) */
-    password: string;
-}
-
-const userSchema = new mongoose.Schema<UserInterface>({
+const userSchema = new mongoose.Schema({
     name: {
         type: String,       
         required: [true, 'El nombre es obligatorio'],
@@ -38,9 +28,9 @@ const userSchema = new mongoose.Schema<UserInterface>({
         maxlength: [100, 'La contraseña no puede exceder 100 caracteres']
     }
 }, {
-    timestamps: true
+    timestamps: true // Agrega campos createdAt y updatedAt automáticamente
 });
 
-const User = mongoose.model<UserInterface>("User", userSchema);
+const User = mongoose.model("User", userSchema);
 
 export default User;
