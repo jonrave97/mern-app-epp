@@ -2,3 +2,9 @@
 
 #Para instalar bcrypt, usa el siguiente comando:
 npm install bcrypt 
+
+#Instalacion de Tailwind en frontend
+npm install tailwindcss @tailwindcss/vite
+
+#Instalacion de react-router-dom
+npm install react-router-dom
