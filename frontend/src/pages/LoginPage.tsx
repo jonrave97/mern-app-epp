@@ -1,4 +1,5 @@
 import { useState } from "react";
+import API from "../services/api";
 
 function LoginPage() {
     //Definimos el estado para los campos del formulario
@@ -9,6 +10,15 @@ function LoginPage() {
     const handleSubmit = (event: React.FormEvent) => {
     console.log("Formulario enviado");
     console.log("Email:", email, "Contraseña:", password);
+
+
+   const response = API.post('/users/login', { email, password });
+   console.log("Respuesta del servidor:", response);
+    // API.post('/register', { email, password })
+    //     .then(response => {
+    //         console.log("Respuesta del servidor:", response.data);
+    //     });
+
     event.preventDefault();
     // Aquí puedes agregar la lógica para manejar el inicio de sesión
 };

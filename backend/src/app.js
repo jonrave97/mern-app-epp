@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { json } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import morgan from 'morgan';
@@ -10,6 +10,7 @@ const app = express(); // Crear la aplicación de Express
 
 // Definicion de URL de Frontend
 const whiteList = [process.env.FRONTEND_URL];
+// const whiteList = ['http://localhost:5173'];
 
 // Impresion por consola de la URL del Frontend
 console.log('🚀 Frontend URL:', whiteList);
@@ -21,6 +22,9 @@ app.use(express.json()); // Habilitar el parseo de JSON en las solicitudes
 // Configuración de CORS
 app.use(cors({
     origin: function(origin, callback) {
+        console.log(origin,'<< origin recibido');        console.log('🔍 includes result:', whiteList.includes(origin));
+        console.log('🔍 whiteList[0] === origin:', whiteList[0] === origin);
+        console.log(whiteList[0],'Imprimiendo WHITELIST[0]');
         if (whiteList.includes(origin)) {
             // Puede consultar la API
             console.log('✅ Solicitud CORS permitida:', origin);

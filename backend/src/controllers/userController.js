@@ -21,7 +21,7 @@ export const registerUser = async  (req, res ) =>
         //agrego la contraseña hasheada al nuevo usuario
         newUser.password = await bcrypt.hash(password, salt);
         // Guardar el usuario en la base de datos
-        await newUser.save();
+        // await newUser.save();
         // Enviar una respuesta exitosa
         console.log('✅ Usuario registrado correctamente');
     } catch (error) {
@@ -34,4 +34,8 @@ export const registerUser = async  (req, res ) =>
     // res.send('Usuario registrado');
 }
 
-export const loginUser = (req, res ) =>res.send('Usuario logueado');
+export const loginUser = (req, res ) =>
+{
+     const {  email, password } = req.body;
+     console.log('✅ Usuario registrado encontrado');
+}
