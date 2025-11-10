@@ -1,6 +1,8 @@
 import {BrowserRouter, Routes, Route} from 'react-router-dom';
+import NotFoundPage from './pages/common/NotFoundPage.tsx';
 import HomePage from './pages/HomePage.tsx';
-import LoginPage from './pages/LoginPage.tsx';
+import LoginPage from './pages/auth/LoginPage.tsx';
+import AdminRoutes from './routes/AdminRoutes.tsx'; // Rutas específicas para el área de administración
 
 function App() {
   return (
@@ -9,6 +11,10 @@ function App() {
       <Routes>
         <Route path='/' element={<HomePage />} />
         <Route path='/login' element={<LoginPage />} />
+        <Route path='/admin/*' element={<AdminRoutes />} />
+
+        {/* En caso de que la ruta no exista muestra el 404 */}
+        <Route path='*' element={<NotFoundPage />} />
       </Routes>
       <div>
         {/* Aquí podrían ir otros componentes comunes, como un footer */}

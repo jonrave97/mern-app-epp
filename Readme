@@ -8,3 +8,6 @@ npm install tailwindcss @tailwindcss/vite
 
 #Instalacion de react-router-dom
 npm install react-router-dom
+
+#Instalacion de axios
+npm install axios

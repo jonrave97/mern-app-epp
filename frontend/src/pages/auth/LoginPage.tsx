@@ -1,5 +1,5 @@
 import { useState } from "react";
-import API from "../services/api";
+import API from "../../services/api";
 
 function LoginPage() {
     //Definimos el estado para los campos del formulario
