@@ -18,10 +18,6 @@ function App() {
         {/* En caso de que la ruta no exista muestra el 404 */}
         <Route path='*' element={<NotFoundPage />} />
       </Routes>
-      <div>
-        {/* Aquí podrían ir otros componentes comunes, como un footer */}
-
-      </div>
     </BrowserRouter>
   );
 }

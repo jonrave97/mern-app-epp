@@ -8,7 +8,8 @@ function AdminRoutes()
 {
    return (
         <Routes>
-            <Route path='/admin' element={<AdminLayout />}>
+            {/**Ya no se agrega /admin porque ya está en App.tsx */}
+            <Route path='/' element={<AdminLayout />}>
             {/* <Route path='/admin/index' element={<AdminDashboardPage />} /> */}
                 <Route path='users/create' element={<UserCreatePage />} />
                 <Route path='users' element={<UserListPage />} />
