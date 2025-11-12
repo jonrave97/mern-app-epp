@@ -1,6 +1,7 @@
 import User from '../models/userModel.js';
 import bcrypt from 'bcrypt';
 import jsonwebtoken from 'jsonwebtoken';
+import { getAllUsers } from '../services/userServices.js';
 
 export const registerUser = async  (req, res ) =>
 {
@@ -39,3 +40,17 @@ export const loginUser = (req, res ) =>
      const {  email, password } = req.body;
      console.log('✅ Usuario registrado encontrado');
 }
+
+export const getUsers = async (req, res) => {
+    console.log('🔄 Solicitud para obtener todos los usuarios recibida');
+  const result = await getAllUsers();
+  
+  if (result.success) {
+    console.log('✅ Usuarios obtenidos correctamente');
+    res.status(200).json(result);
+
+  } else {
+    console.log('❌ Error al obtener usuarios:', result.message);
+    res.status(500).json(result);
+  }
+};

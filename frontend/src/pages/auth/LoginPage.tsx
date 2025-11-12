@@ -73,10 +73,10 @@ function LoginPage() {
                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
                             />
                         </div>
-
+                        <a href="/forgot-password" className="text-sm  text-indigo-600 hover:underline ">Olvidaste tu contraseña?</a>
                         <button
                             type="submit"
-                            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                            className="w-full my-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                         >
                             Iniciar Sesión
                         </button>
