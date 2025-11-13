@@ -1,13 +1,40 @@
-export default function Navbar() {
+import { useState, useEffect, useRef } from 'react';
+
+export default function Navbar({ sidebarOpen, setSidebarOpen }: { sidebarOpen: boolean; setSidebarOpen: (open: boolean) => void }) {
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const toggleDropdown = () => {
+    setDropdownOpen(!dropdownOpen);
+  };
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+
+    if (dropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [dropdownOpen]);
+
   return (
-    <nav className="fixed top-0 z-50 w-full bg-primary border-gray-300">
+    <nav className="fixed top-0 z-50 w-full bg-neutral-primary-soft bg-primary border-gray-300 shadow-lg">
       <div className="px-3 py-3 lg:px-5 lg:pl-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center justify-start rtl:justify-end">
             <button
-              data-drawer-target="top-bar-sidebar"
-              data-drawer-toggle="top-bar-sidebar"
-              aria-controls="top-bar-sidebar"
+              onClick={toggleSidebar}
               type="button"
               className="sm:hidden text-heading bg-transparent box-border border border-transparent hover:bg-neutral-secondary-medium focus:ring-4 focus:ring-neutral-tertiary font-medium leading-5 rounded-base text-sm p-2 focus:outline-none"
             >
@@ -38,13 +65,13 @@ export default function Navbar() {
             </a>
           </div>
           <div className="flex items-center">
-            <div className="flex items-center ms-3">
+            <div className="flex items-center ms-3 relative" ref={dropdownRef}>
               <div>
                 <button
                   type="button"
-                  className="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
-                  aria-expanded="false"
-                  data-dropdown-toggle="dropdown-user"
+                  onClick={toggleDropdown}
+                  className="flex text-sm bg-gray-800 rounded-full focus:ring-2 focus:ring-gray-50"
+                  aria-expanded={dropdownOpen}
                 >
                   <span className="sr-only">Open user menu</span>
                   <img
@@ -55,22 +82,21 @@ export default function Navbar() {
                 </button>
               </div>
               <div
-                className="z-50 hidden bg-neutral-primary-medium border border-default-medium rounded-base shadow-lg w-44"
-                id="dropdown-user"
+                className={`${dropdownOpen ? '' : 'hidden'} absolute top-full right-0 mt-2 bg-neutral-primary-medium border border-gray-200 rounded-md shadow-2xl w-44 bg-gray-50` }
               >
                 <div
                   className="px-4 py-3 border-b border-default-medium"
                   role="none"
                 >
                   <p className="text-sm font-medium text-heading" role="none">
-                    Neil Sims
+                    Administrador
                   </p>
                   <p className="text-sm text-body truncate" role="none">
-                    neil.sims@flowbite.com
+                    correo@correo.com
                   </p>
                 </div>
-                <ul className="p-2 text-sm text-body font-medium" role="none">
-                  <li>
+                <ul className="py-2 px-0 text-sm text-body font-light" role="none">
+                  <li className="hover:bg-gray-200 hover:font-medium transition border border-transparent hover:border-gray-200">
                     <a
                       href="#"
                       className="inline-flex items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded"
@@ -79,7 +105,7 @@ export default function Navbar() {
                       Dashboard
                     </a>
                   </li>
-                  <li>
+                  <li className='hover:bg-gray-200 hover:font-medium transition border border-transparent hover:border-gray-200'>
                     <a
                       href="#"
                       className="inline-flex items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded"
@@ -88,7 +114,7 @@ export default function Navbar() {
                       Settings
                     </a>
                   </li>
-                  <li>
+                  <li className='hover:bg-gray-200 hover:font-medium transition border border-transparent hover:border-gray-200'>
                     <a
                       href="#"
                       className="inline-flex items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded"
@@ -97,7 +123,7 @@ export default function Navbar() {
                       Earnings
                     </a>
                   </li>
-                  <li>
+                  <li className='hover:bg-gray-200 hover:font-medium transition border border-transparent hover:border-gray-200'>
                     <a
                       href="#"
                       className="inline-flex items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded"
