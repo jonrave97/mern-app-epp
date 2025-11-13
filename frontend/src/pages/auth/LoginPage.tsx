@@ -1,27 +1,9 @@
-import { useState } from "react";
-import API from "../../services/api";
+import { useLogin } from '../../hooks/auth/useLogin';
 
 function LoginPage() {
-    //Definimos el estado para los campos del formulario
-    const [email, setEmail] = useState<string>("");
-    const [password, setPassword] = useState<string>("");
 
-    // Definimos la función para manejar el envío del formulario
-    const handleSubmit = (event: React.FormEvent) => {
-    console.log("Formulario enviado");
-    console.log("Email:", email, "Contraseña:", password);
-
-
-   const response = API.post('/users/login', { email, password });
-   console.log("Respuesta del servidor:", response);
-    // API.post('/register', { email, password })
-    //     .then(response => {
-    //         console.log("Respuesta del servidor:", response.data);
-    //     });
-
-    event.preventDefault();
-    // Aquí puedes agregar la lógica para manejar el inicio de sesión
-};
+    // Usamos el hook personalizado para manejar el login
+    const { email, setEmail, password, setPassword, loading, error, success, handleLogin } = useLogin();
     return (
         <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
             <div className="max-w-md w-full">
@@ -41,7 +23,17 @@ function LoginPage() {
                         <p className="text-gray-600">Ingresa tus credenciales para acceder a tu cuenta</p>
                     </div>
 
-                    <form className="space-y-6" onSubmit={handleSubmit}>
+                    <form className="space-y-6" onSubmit={handleLogin}>
+                        {error && (
+                            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg">
+                                {error}
+                            </div>
+                        )}
+                        {success && (
+                            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg">
+                                ✅ Login exitoso
+                            </div>
+                        )}
                         <div>
                             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                                 Email
@@ -54,7 +46,7 @@ function LoginPage() {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 autoComplete="email"
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition duration-200"
                             />
                         </div>
 
@@ -70,15 +62,16 @@ function LoginPage() {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 autoComplete="current-password"
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition duration-200"
                             />
+                        <a href="/forgot-password" className="text-sm  text-gray-600 hover:underline  ">Olvidaste tu contraseña?</a>
                         </div>
-                        <a href="/forgot-password" className="text-sm  text-indigo-600 hover:underline ">Olvidaste tu contraseña?</a>
                         <button
                             type="submit"
-                            className="w-full my-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                            disabled={loading}
+                            className="btn-primary w-full bg-primary text-white font-semibold py-3 px-4 rounded-lg transition duration-200" 
                         >
-                            Iniciar Sesión
+                            {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
                         </button>
                     </form>
                 </div>
