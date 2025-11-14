@@ -1,6 +1,9 @@
 import { useLogin } from '../../hooks/auth/useLogin';
+import { usePageTitle } from '../../hooks/page/usePageTitle';
 
 function LoginPage() {
+
+    usePageTitle("Login");
 
     // Usamos el hook personalizado para manejar el login
     const { email, setEmail, password, setPassword, loading, error, success, handleLogin } = useLogin();
