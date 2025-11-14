@@ -1,4 +1,5 @@
-import mongoose from "mongoose";
+import mongoose, { mongo } from "mongoose";
+import { generateToken } from "../libs/tokenGenerator.js";
 
 /**
  * Schema que define la estructura de un usuario en la aplicación
@@ -26,6 +27,31 @@ const userSchema = new mongoose.Schema({
         trim: true,
         minlength: [8, 'La contraseña debe tener al menos 8 caracteres'],
         maxlength: [100, 'La contraseña no puede exceder 100 caracteres']
+    },
+    token:{
+        type: String,
+        trim: true,
+        default: () => generateToken()
+    },
+    confirmed: {
+        type: Boolean,
+        default: false
+    },
+    position: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Position'
+    },
+    bosses:[
+        {
+            boss:{
+                type:mongoose.Schema.Types.ObjectId,
+                ref:'User',
+            },
+        },
+    ],
+    warehouses:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Warehouse'
     }
 }, {
     timestamps: true // Agrega campos createdAt y updatedAt automáticamente
