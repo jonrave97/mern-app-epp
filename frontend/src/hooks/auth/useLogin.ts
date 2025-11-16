@@ -18,6 +18,12 @@ export const useLogin = () => {
       console.log('🔄 Enviando login...');
       console.log('Email:', email, 'Contraseña:', password);
 
+      if(!email || !password) {
+        console.error('❌ Error: Email y contraseña son obligatorios');
+        setError('Email y contraseña son obligatorios');
+        setLoading(false);
+        return; 
+      }
       // Llamada al servicio de login
       // incluimos al email y password en la petición para autenticar al usuario
       const response = await loginUser(email, password);

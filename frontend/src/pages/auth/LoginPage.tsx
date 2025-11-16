@@ -45,7 +45,7 @@ function LoginPage() {
                                 id="email"
                                 type="email"
                                 placeholder="correo@correo.com"
-                                required
+                                
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 autoComplete="email"
@@ -61,7 +61,7 @@ function LoginPage() {
                                 id="password"
                                 type="password"
                                 placeholder="••••••••"
-                                required
+                                
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 autoComplete="current-password"
@@ -72,7 +72,7 @@ function LoginPage() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="btn-primary w-full bg-primary text-white font-semibold py-3 px-4 rounded-lg transition duration-200" 
+                            className="btn-primary w-full bg-primary text-white font-semibold py-3 px-4 rounded-lg transition duration-200 cursor-pointer" 
                         >
                             {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
                         </button>
