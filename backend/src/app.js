@@ -17,7 +17,24 @@ console.log('🚀 Frontend URL:', whiteList);
 
 // ========== MIDDLEWARES (DEBEN IR ANTES DE LAS RUTAS) ==========
 app.use(morgan('dev')); // Middleware para registrar solicitudes HTTP
+
+// Middleware de debug ANTES de parsear JSON
+app.use((req, res, next) => {
+    console.log('📥 Headers recibidos:', {
+        'content-type': req.headers['content-type'],
+        'content-length': req.headers['content-length']
+    });
+    next();
+});
+
 app.use(express.json()); // Habilitar el parseo de JSON en las solicitudes
+app.use(express.urlencoded({ extended: true })); // Para datos en formularios
+
+// Middleware de debug DESPUÉS de parsear JSON
+app.use((req, res, next) => {
+    console.log('📨 req.body después de JSON parser:', req.body);
+    next();
+});
 
 // Configuración de CORS
 app.use(cors({

@@ -24,6 +24,7 @@ export const useLogin = () => {
         setLoading(false);
         return; 
       }
+
       // Llamada al servicio de login
       // incluimos al email y password en la petición para autenticar al usuario
       const response = await loginUser(email, password);
