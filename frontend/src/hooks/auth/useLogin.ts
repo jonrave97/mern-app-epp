@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { loginUser } from '../../services/authService';
 
 export const useLogin = () => {
@@ -8,6 +9,7 @@ export const useLogin = () => {
   const [loading, setLoading] = useState<boolean>(false); // Estado para indicar si la solicitud de login está en proceso
   const [error, setError] = useState<string | null>(null); // Estado para almacenar errores de login
   const [success, setSuccess] = useState<boolean>(false); // Estado para indicar si el login fue exitoso
+  const navigate = useNavigate(); // Hook de React Router para navegación programática
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,6 +37,12 @@ export const useLogin = () => {
       // Opcional: Limpiar formulario
       setEmail('');
       setPassword('');
+
+      // Aquí podrías redirigir al usuario o actualizar el estado global de autenticación
+      // Por ejemplo, podrías guardar el token en el almacenamiento local
+      localStorage.setItem('token', response.token);
+      navigate('/admin/dashboard'); // Redirigir al dashboard del admin
+
     } catch (err) {
         // Manejo de errores
       const errorMessage = err instanceof Error ? err.message : 'Error al iniciar sesión';

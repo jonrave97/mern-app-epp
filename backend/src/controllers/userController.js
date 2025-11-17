@@ -64,19 +64,17 @@ export const loginUser = async (req, res) => {
       return res.status(401).json({ message: "Credenciales incorrectas" });
     }
 
-    // const token = jsonwebtoken.sign(
-    //   { id: userFound._id,
-    //     email: userFound.email
-    //    },
-    //   process.env.JWT_SECRET,
-    //   { expiresIn: "1hr" }
-    // );
+    const token = jsonwebtoken.sign(
+      { id: userFound._id,
+        email: userFound.email
+       },
+      process.env.JWT_SECRET,
+      { expiresIn: "1hr" }
+    );
 
-    res.json({ message: "Login exitoso", id: userFound._id, email: userFound.email});
-    console.log("🔄 Intentando iniciar sesión para el email:", email);
-
-    console.log("✅ Usuario registrado encontrado");
-    res.status(200).json({ message: "Login en proceso" });
+    console.log("✅ Login exitoso para:", email);
+    return res.status(200).json({ message: "Login exitoso", id: userFound._id, email: userFound.email, token });
+    
   } catch (error) {
     console.error("❌ Error al iniciar sesión:", error.message);
     return res.status(500).json({ message: "Error al iniciar sesión" });
