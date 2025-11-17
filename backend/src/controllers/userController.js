@@ -2,6 +2,7 @@ import User from "../models/userModel.js";
 import bcrypt from "bcrypt";
 import jsonwebtoken from "jsonwebtoken";
 import { getUserbyEmailWithPassword } from "../services/userServices.js";
+// import { generateToken } from "../libs/tokenGenerator.js";
 
 export const registerUser = async (req, res) => {
   // Extraer datos del cuerpo de la solicitud
@@ -78,5 +79,43 @@ export const loginUser = async (req, res) => {
   } catch (error) {
     console.error("❌ Error al iniciar sesión:", error.message);
     return res.status(500).json({ message: "Error al iniciar sesión" });
+  }
+};
+
+// Obtener perfil del usuario autenticado
+export const getUserProfile = async (req, res) => {
+  try {
+    // Obtener el token del header
+    const token = req.headers.authorization?.split(" ")[1];
+    
+    if (!token) {
+      return res.status(401).json({ message: "Token no proporcionado" });
+    }
+
+    // Verificar y decodificar el token
+    const decoded = jsonwebtoken.verify(token, process.env.JWT_SECRET);
+    
+    // Buscar el usuario en la base de datos
+    const user = await User.findById(decoded.id).select("-password");
+    
+    if (!user) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    console.log("✅ Perfil obtenido para:", user.email);
+    return res.status(200).json({ 
+      message: "Perfil obtenido exitosamente",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt
+      }
+    });
+    
+  } catch (error) {
+    console.error("❌ Error al obtener perfil:", error.message);
+    return res.status(401).json({ message: "Token inválido o expirado" });
   }
 };
