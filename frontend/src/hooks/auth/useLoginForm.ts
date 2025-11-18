@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loginUser } from '../../services/authService';
+import { useAuth } from './useAuthContext';
 
 export const useLogin = () => {
 
@@ -10,6 +11,7 @@ export const useLogin = () => {
   const [error, setError] = useState<string | null>(null); // Estado para almacenar errores de login
   const [success, setSuccess] = useState<boolean>(false); // Estado para indicar si el login fue exitoso
   const navigate = useNavigate(); // Hook de React Router para navegación programática
+  const { setAuth } = useAuth(); // Usar el contexto de autenticación
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,14 +36,22 @@ export const useLogin = () => {
       console.log('✅ Login exitoso:', response);
       setSuccess(true);
       
-      // Opcional: Limpiar formulario
+      // Guardar token en localStorage
+      localStorage.setItem('token', response.token);
+      
+      // Actualizar el contexto de autenticación con los datos del usuario
+      setAuth({
+        id: response.id,
+        email: response.email,
+        name: response.name || response.email, // Si no viene name, usa email
+      });
+      
+      // Limpiar formulario
       setEmail('');
       setPassword('');
 
-      // Aquí podrías redirigir al usuario o actualizar el estado global de autenticación
-      // Por ejemplo, podrías guardar el token en el almacenamiento local
-      localStorage.setItem('token', response.token);
-      navigate('/admin/dashboard'); // Redirigir al dashboard del admin
+      // Redirigir al dashboard del admin
+      navigate('/admin/dashboard');
 
     } catch (err) {
         // Manejo de errores

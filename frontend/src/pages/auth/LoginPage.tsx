@@ -1,4 +1,4 @@
-import { useLogin } from '../../hooks/auth/useLogin';
+import { useLogin } from '../../hooks/auth/useLoginForm';
 import { usePageTitle } from '../../hooks/page/usePageTitle';
 
 function LoginPage() {

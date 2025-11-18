@@ -1,4 +1,7 @@
 import {BrowserRouter, Routes, Route} from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import { ProtectedRoute } from './routes/ProtectedRoute';
+import { PublicRoute } from './routes/PublicRoute';
 import NotFoundPage from './pages/common/NotFoundPage.tsx';
 import HomePage from './pages/HomePage.tsx';
 import LoginPage from './pages/auth/LoginPage.tsx';
@@ -7,18 +10,32 @@ import ForgotPassword from './pages/auth/ForgotPasswordPage.tsx';
 
 function App() {
   return (
-    <BrowserRouter>
-      {/* Aquí podrían ir otros componentes comunes, como un header */}
-      <Routes>
-        <Route path='/' element={<HomePage />} />
-        <Route path='/login' element={<LoginPage />} />
-        <Route path='/admin/*' element={<AdminRoutes />} />
-        <Route path='/forgot-password' element={<ForgotPassword />} />
+    <AuthProvider>
+      <BrowserRouter>
+        {/* Aquí podrían ir otros componentes comunes, como un header */}
+        <Routes>
+          <Route path='/' element={
+            <ProtectedRoute>
+              <HomePage />
+            </ProtectedRoute>
+          } />
+          <Route path='/login' element={
+            <PublicRoute>
+              <LoginPage />
+            </PublicRoute>
+          } />
+          <Route path='/admin/*' element={<AdminRoutes />} />
+          <Route path='/forgot-password' element={
+            <PublicRoute>
+              <ForgotPassword />
+            </PublicRoute>
+          } />
 
-        {/* En caso de que la ruta no exista muestra el 404 */}
-        <Route path='*' element={<NotFoundPage />} />
-      </Routes>
-    </BrowserRouter>
+          {/* En caso de que la ruta no exista muestra el 404 */}
+          <Route path='*' element={<NotFoundPage />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 export default App;
