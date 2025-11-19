@@ -28,6 +28,11 @@ const userSchema = new mongoose.Schema({
         minlength: [8, 'La contraseña debe tener al menos 8 caracteres'],
         maxlength: [100, 'La contraseña no puede exceder 100 caracteres']
     },
+    rol: {
+        type: String,
+        enum: ['admin', 'user', 'warehouse_manager'],
+        default: 'user'
+    },
     token:{
         type: String,
         trim: true,

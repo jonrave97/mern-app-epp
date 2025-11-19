@@ -74,7 +74,16 @@ export const loginUser = async (req, res) => {
     );
 
     console.log("✅ Login exitoso para:", email);
-    return res.status(200).json({ message: "Login exitoso", id: userFound._id, email: userFound.email, token });
+    console.log(userFound);
+    return res.status(200).json({ 
+      message: "Login exitoso1", 
+      id: userFound._id, 
+      name: userFound.name,
+      email: userFound.email,
+      rol: userFound.rol,
+      createdAt: userFound.createdAt,
+      token 
+    });
     
   } catch (error) {
     console.error("❌ Error al iniciar sesión:", error.message);
@@ -109,6 +118,7 @@ export const getUserProfile = async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
+        rol: user.rol,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt
       }
