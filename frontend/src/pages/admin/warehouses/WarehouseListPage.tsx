@@ -1,24 +1,31 @@
-import { useUsers } from '../../../hooks/api/useUsers';
-import type { User } from '../../../types/user';
+import { useState, useEffect } from 'react';
+import type { Warehouses } from '../../../types/warehouses';
 
-function UserListPage() {
-  const { users, loading, error } = useUsers();
+function WarehouseListPage() {
+  const [warehouses, setWarehouses] = useState<Warehouses[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  if (loading) return <div className="p-4">Cargando usuarios...</div>;
+  useEffect(() => {
+    // TODO: Implementar llamada al API para obtener warehouses
+    setLoading(false);
+  }, []);
+
+  if (loading) return <div className="p-4">Cargando bodegas...</div>;
   if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
 
   return (
-    <div className="p-6 0 min-h-screen">
+    <div className="p-6 min-h-screen">
       {/* Encabezado */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Lista de Usuarios</h1>
-        <p className="text-gray-600">Gestiona todos los usuarios del sistema</p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Lista de Bodegas</h1>
+        <p className="text-gray-600">Gestiona todas las bodegas del sistema</p>
       </div>
 
       {/* Mensajes de estado */}
       {loading && (
         <div className="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded-lg mb-4">
-          ⏳ Cargando usuarios...
+          ⏳ Cargando bodegas...
         </div>
       )}
       {error && (
@@ -32,30 +39,34 @@ function UserListPage() {
         <table className="w-full">
           <thead>
             <tr className="bg-primary text-white">
+              <th className="px-6 py-4 text-left font-semibold">Código</th>
               <th className="px-6 py-4 text-left font-semibold">Nombre</th>
-              <th className="px-6 py-4 text-left font-semibold">Email</th>
-              <th className="px-6 py-4 text-left font-semibold">Rol</th>
+              <th className="px-6 py-4 text-left font-semibold">Estado</th>
               <th className="px-6 py-4 text-left font-semibold">Acciones</th>
             </tr>
           </thead>
           <tbody>
-            {users.length === 0 ? (
+            {warehouses.length === 0 ? (
               <tr>
                 <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
-                  No hay usuarios disponibles
+                  No hay bodegas disponibles
                 </td>
               </tr>
             ) : (
-              users.map((user: User) => (
+              warehouses.map((warehouse: Warehouses) => (
                 <tr
-                  key={user._id}
+                  key={warehouse._id}
                   className="border-b border-gray-200 hover:bg-gray-50 transition duration-150"
                 >
-                  <td className="px-6 py-4 text-gray-900">{user.name}</td>
-                  <td className="px-6 py-4 text-gray-600">{user.email}</td>
+                  <td className="px-6 py-4 text-gray-900 font-medium">{warehouse.code}</td>
+                  <td className="px-6 py-4 text-gray-900">{warehouse.name}</td>
                   <td className="px-6 py-4">
-                    <span className="inline-block bg-primary text-white px-3 py-1 rounded-full text-sm font-medium">
-                      {user.rol || 'usuario'}
+                    <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
+                      warehouse.disabled 
+                        ? 'bg-red-100 text-red-800' 
+                        : 'bg-green-100 text-green-800'
+                    }`}>
+                      {warehouse.disabled ? 'Inactiva' : 'Activa'}
                     </span>
                   </td>
                   <td className="px-6 py-4">
@@ -78,4 +89,4 @@ function UserListPage() {
   );
 }
 
-export default UserListPage;
+export default WarehouseListPage;

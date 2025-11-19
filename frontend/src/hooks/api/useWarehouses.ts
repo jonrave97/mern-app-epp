@@ -1,17 +1,17 @@
 import { useState, useEffect } from 'react';
-import { getUsers } from '../services/userService';
+import { getWarehouses } from '../../services/warehouseService';
 
-export const useUsers = () => {
-  const [users, setUsers] = useState([]);
+export const useWarehouses = () => {
+  const [warehouses, setWarehouses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchWarehouses = async () => {
       try {
-        const data = await getUsers();
+        const data = await getWarehouses();
         if (data.success) {
-          setUsers(data.data);
+          setWarehouses(data.data);
         } else {
           setError(data.message);
         }
@@ -23,8 +23,8 @@ export const useUsers = () => {
       }
     };
 
-    fetchUsers();
+    fetchWarehouses();
   }, []);
 
-  return { users, loading, error };
+  return { warehouses, loading, error };
 };

@@ -44,6 +44,8 @@ export const useLogin = () => {
         id: response.id,
         email: response.email,
         name: response.name || response.email, // Si no viene name, usa email
+        rol: response.rol, // Nota: en el backend es 'rol'
+        createdAt: response.createdAt,
       });
       
       // Limpiar formulario

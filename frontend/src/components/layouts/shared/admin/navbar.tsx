@@ -1,17 +1,24 @@
 import { useState, useEffect, useRef } from 'react';
+import { useAuth } from '../../../../hooks/auth/useAuthContext';
+
 
 export default function Navbar({ sidebarOpen, setSidebarOpen }: { sidebarOpen: boolean; setSidebarOpen: (open: boolean) => void }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { auth, logOut } = useAuth();
 
+
+  //Funcion para alternar el estado del dropdown de usuario
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
   };
 
+  //Funcion para alternar el estado del sidebar
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
+  // Cerrar el dropdown si se hace clic fuera de él
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -56,7 +63,7 @@ export default function Navbar({ sidebarOpen, setSidebarOpen }: { sidebarOpen: b
                 />
               </svg>
             </button>
-            <a href="/" className="flex ms-10 md:me-24">
+            <a href="/admin/dashboard" className="flex ms-10 md:me-24">
               <img
                 src="/kaltire.png"
                 className="h-6 me-3"
@@ -66,19 +73,21 @@ export default function Navbar({ sidebarOpen, setSidebarOpen }: { sidebarOpen: b
           </div>
           <div className="flex items-center">
             <div className="flex items-center ms-3 relative" ref={dropdownRef}>
-              <div>
+              <div className='flex items-center '>
+                <span className='text-white text-sm font-medium'>{auth?.rol || 'Role'}</span>
                 <button
                   type="button"
                   onClick={toggleDropdown}
-                  className="flex text-sm bg-gray-800 rounded-full focus:ring-2 focus:ring-gray-50"
+                  className="flex text-sm  rounded-full cursor-pointer pl-3"
                   aria-expanded={dropdownOpen}
                 >
                   <span className="sr-only">Open user menu</span>
                   <img
-                    className="w-8 h-8 rounded-full"
+                    className="w-full h-8 rounded-full"
                     src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
                     alt="user photo"
                   />
+                
                 </button>
               </div>
               <div
@@ -89,10 +98,10 @@ export default function Navbar({ sidebarOpen, setSidebarOpen }: { sidebarOpen: b
                   role="none"
                 >
                   <p className="text-sm font-medium text-heading" role="none">
-                    Administrador
+                    {auth?.name || 'Usuario'}
                   </p>
                   <p className="text-sm text-body truncate" role="none">
-                    correo@correo.com
+                    {auth?.email || 'correo@correo.com'}
                   </p>
                 </div>
                 <ul className="py-2 px-0 text-sm text-body font-light" role="none">
@@ -124,13 +133,13 @@ export default function Navbar({ sidebarOpen, setSidebarOpen }: { sidebarOpen: b
                     </a>
                   </li>
                   <li className='hover:bg-gray-200 hover:font-medium transition border border-transparent hover:border-gray-200'>
-                    <a
-                      href="#"
-                      className="inline-flex items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded"
+                    <button
+                      onClick={logOut}
+                      className="inline-flex items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded text-left"
                       role="menuitem"
                     >
                       Sign out
-                    </a>
+                    </button>
                   </li>
                 </ul>
               </div>

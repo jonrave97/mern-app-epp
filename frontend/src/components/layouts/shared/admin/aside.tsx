@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { WarehouseIcon } from '../../../icons/index';
 
 export default function Aside({ sidebarOpen }: { sidebarOpen: boolean }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -58,27 +59,11 @@ export default function Aside({ sidebarOpen }: { sidebarOpen: boolean }) {
           </li>
           <li className="px-3 hover:bg-gray-200 hover:rounded-base transition border border-transparent hover:border-gray-200">
             <a
-              href="#"
+              href="/admin/warehouses"
               className="flex items-center px-2 py-1.5 text-body rounded-base hover:text-fg-brand group"
             >
-              <svg
-                className="shrink-0 w-5 h-5 transition duration-75 group-hover:text-fg-brand"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M15 5v14M9 5v14M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z"
-                />
-              </svg>
-              <span className="flex-1 ms-3 whitespace-nowrap">Kanban</span>
+              <WarehouseIcon className="shrink-0 w-5 h-5 transition duration-75 group-hover:text-fg-brand" /> 
+              <span className="flex-1 ms-3 whitespace-nowrap">Warehouse</span>
               <span className="bg-neutral-secondary-medium border border-default-medium text-heading text-xs font-medium px-1.5 py-0.5 rounded-sm">
                 Pro
               </span>

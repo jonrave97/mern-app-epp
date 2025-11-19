@@ -7,7 +7,7 @@ export interface User {
     id: string;
     email: string;
     name: string;
-    // role: "admin" | "user" | "warehouse_manager";
+    rol?: string;
     createdAt?: string;
     updatedAt?: string;
 }
