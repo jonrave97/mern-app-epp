@@ -1,18 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useWarehouses } from '../../../hooks/api/useWarehouses';
 import type { Warehouses } from '../../../types/warehouses';
 
 function WarehouseListPage() {
-  const [warehouses, setWarehouses] = useState<Warehouses[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    // TODO: Implementar llamada al API para obtener warehouses
-    setLoading(false);
-  }, []);
+  const { warehouses, loading, error } = useWarehouses();
 
   if (loading) return <div className="p-4">Cargando bodegas...</div>;
   if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
+
 
   return (
     <div className="p-6 min-h-screen">
