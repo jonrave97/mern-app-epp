@@ -1,10 +1,7 @@
 import { Router } from "express";
-
+import {getAllWarehouses} from "../controllers/warehouseController.js";
+import { get } from "mongoose";
 const warehouseRoutes = Router();
 
-warehouseRoutes.get('/', (req, res) => {
-  res.json({ message: 'Rutas de almacenes (warehouses) funcionando' });
-});
-
-// Aquí irían las rutas relacionadas con los almacenes (warehouses)
+warehouseRoutes.get('/all',getAllWarehouses); // Ruta para obtener todos los almacenes
 export default warehouseRoutes;
