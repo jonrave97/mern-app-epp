@@ -11,3 +11,23 @@ npm install react-router-dom
 
 #Instalacion de axios
 npm install axios
+
+# Convenciones de mensajes de commit
+
+feat: nueva funcionalidad
+
+fix: corrección de errores
+
+docs: cambios en documentación
+
+style: cambios de formato (no afectan lógica)
+
+refactor: reescritura sin cambiar comportamiento
+
+test: añadir o corregir tests
+
+chore: tareas de mantenimiento (build, dependencias, etc.)
+
+perf: mejoras de rendimiento
+
+ci: cambios en configuraciones de integración continua
