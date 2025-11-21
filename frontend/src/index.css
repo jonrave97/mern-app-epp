@@ -15,6 +15,22 @@
   color: rgb(255 105 0);
 }
 
+.text-primary-hover {
+  color: rgb(222 93 2);
+}
+
+.bg-primary-hover {
+  background-color: rgb(222 93 2);
+}
+
+.ring-primary {
+  --tw-ring-color: rgb(255 105 0);
+}
+
+.border-primary {
+  border-color: rgb(255 105 0);
+}
+
 .bg-secondary {
   background-color: rgb(102 102 102);
 }
@@ -29,6 +45,10 @@
 
 .text-danger {
   color: rgb(239 68 68);
+}
+
+.border-danger {
+  border-color: rgb(239 68 68);
 }
 
 /* Input focus - Solo focus y border */
@@ -55,4 +75,8 @@ input:focus {
 }
 .bg-primary-hover:hover {
   background-color: rgb(222 93 2);
+}
+
+.bg-primary-light {
+  background-color: rgba(255, 105, 0, 0.1);
 }

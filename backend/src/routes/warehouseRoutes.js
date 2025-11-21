@@ -1,7 +1,16 @@
 import { Router } from "express";
-import {getAllWarehouses} from "../controllers/warehouseController.js";
-import { get } from "mongoose";
+import {
+  getAllWarehouses,
+  createWarehouse,
+  updateWarehouse,
+  deleteWarehouse
+} from "../controllers/warehouseController.js";
+
 const warehouseRoutes = Router();
 
-warehouseRoutes.get('/all',getAllWarehouses); // Ruta para obtener todos los almacenes
+warehouseRoutes.get('/all', getAllWarehouses);
+warehouseRoutes.post('/create', createWarehouse);
+warehouseRoutes.put('/update/:id', updateWarehouse);
+warehouseRoutes.delete('/delete/:id', deleteWarehouse);
+
 export default warehouseRoutes;
