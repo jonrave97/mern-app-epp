@@ -40,7 +40,7 @@ export const Modal = ({ isOpen, onClose, title, children, size = 'md' }: ModalPr
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Overlay con efecto parallax */}
       <div 
-        className="absolute inset-0 bg-gradient-to-br from-gray-900/60 via-gray-800/50 to-gray-900/60 backdrop-blur-sm transition-all duration-300"
+        className="absolute inset-0 bg-linear-to-br from-gray-900/60 via-gray-800/50 to-gray-900/60 backdrop-blur-sm transition-all duration-300"
         onClick={onClose}
         style={{
           backgroundSize: '400% 400%',
@@ -50,7 +50,7 @@ export const Modal = ({ isOpen, onClose, title, children, size = 'md' }: ModalPr
 
       {/* Modal Content con fondo suave */}
       <div 
-        className={`relative bg-gradient-to-br from-gray-50 via-white to-gray-100 rounded-2xl shadow-2xl w-full ${sizeClasses[size]} mx-4 max-h-[90vh] flex flex-col transform transition-all duration-300 ease-out`}
+        className={`relative bg-linear-to-br from-gray-50 via-white to-gray-100 rounded-2xl shadow-2xl w-full ${sizeClasses[size]} mx-4 max-h-[90vh] flex flex-col transform transition-all duration-300 ease-out`}
         style={{
           backdropFilter: 'blur(20px)',
           border: '1px solid rgba(255, 255, 255, 0.3)',
@@ -58,11 +58,11 @@ export const Modal = ({ isOpen, onClose, title, children, size = 'md' }: ModalPr
         }}
       >
         {/* Header con gradiente sutil */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200/50 bg-gradient-to-r from-gray-50 to-white rounded-t-2xl">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200/50 bg-linear-to-r from-gray-50 to-white rounded-t-2xl">
           <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors hover:rotate-90 transform duration-300"
+            className="text-gray-400 hover:text-gray-600 transition-colors hover:rotate-90 transform duration-300 cursor-pointer"
             aria-label="Cerrar modal"
           >
             <Close className="w-6 h-6" />
@@ -74,21 +74,6 @@ export const Modal = ({ isOpen, onClose, title, children, size = 'md' }: ModalPr
           {children}
         </div>
       </div>
-
-      {/* Estilos para animación */}
-      <style>{`
-        @keyframes gradientShift {
-          0% {
-            background-position: 0% 50%;
-          }
-          50% {
-            background-position: 100% 50%;
-          }
-          100% {
-            background-position: 0% 50%;
-          }
-        }
-      `}</style>
     </div>
   );
 };

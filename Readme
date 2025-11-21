@@ -1,15 +1,15 @@
-#Instalar
+# Instalar
 
-#Para instalar bcrypt, usa el siguiente comando:
+# Para instalar bcrypt, usa el siguiente comando:
 npm install bcrypt 
 
-#Instalacion de Tailwind en frontend
+# Instalacion de Tailwind en frontend
 npm install tailwindcss @tailwindcss/vite
 
-#Instalacion de react-router-dom
+# Instalacion de react-router-dom
 npm install react-router-dom
 
-#Instalacion de axios
+# Instalacion de axios
 npm install axios
 
 # Convenciones de mensajes de commit

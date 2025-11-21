@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useWarehouses } from '../../../hooks/api/useWarehouses';
 import { createWarehouse, updateWarehouse } from '../../../services/warehouseService';
 import { Modal } from '../../../components/shared/Modal';
+import { ModalActions } from '../../../components/shared/ModalActions';
 import { Pagination } from '../../../components/shared/Pagination';
 import { WarehouseForm } from '../../../components/forms/WarehouseForm';
 import { EditIcon, LockIcon } from '../../../components/icons';
@@ -308,29 +309,14 @@ function WarehouseListPage() {
                 ⚠️ La bodega quedará inactiva pero no se eliminará.
               </p>
             )}
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={closeModals}
-                disabled={actionLoading}
-                className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleToggleWarehouseStatus}
-                disabled={actionLoading}
-                className={`px-6 py-2 text-white rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed ${
-                  selectedWarehouse.disabled
-                    ? 'bg-green-600 hover:bg-green-700'
-                    : 'bg-red-600 hover:bg-red-700'
-                }`}
-              >
-                {actionLoading 
-                  ? (selectedWarehouse.disabled ? 'Activando...' : 'Desactivando...') 
-                  : (selectedWarehouse.disabled ? 'Activar' : 'Desactivar')
-                }
-              </button>
-            </div>
+            <ModalActions
+              onCancel={closeModals}
+              onConfirm={handleToggleWarehouseStatus}
+              confirmText={selectedWarehouse.disabled ? 'Activar' : 'Desactivar'}
+              isLoading={actionLoading}
+              loadingText={selectedWarehouse.disabled ? 'Activando...' : 'Desactivando...'}
+              confirmVariant={selectedWarehouse.disabled ? 'success' : 'danger'}
+            />
           </div>
         )}
       </Modal>

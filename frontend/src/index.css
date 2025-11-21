@@ -80,3 +80,16 @@ input:focus {
 .bg-primary-light {
   background-color: rgba(255, 105, 0, 0.1);
 }
+
+/* Animación para modal overlay */
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
