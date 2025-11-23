@@ -10,7 +10,7 @@ import AreaListPage from '../pages/admin/areas/AreaListPage.tsx';
 import PositionListPage from '../pages/admin/positions/PositionListPage.tsx';
 import EppListPage from '../pages/admin/epps/EppListPage.tsx';
 import CategoryListPage from '../pages/admin/categories/CategoryListPage.tsx';
-import PermissionPanel from '../pages/admin/permissions/PermissionPanelFixed.tsx';
+import PermissionPanel from '../pages/admin/permissions/PermissionPanel.tsx';
 
 function AdminRoutes()
 {
