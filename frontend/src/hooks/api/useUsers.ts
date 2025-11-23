@@ -8,6 +8,10 @@ interface User {
   name: string;
   email: string;
   rol?: string;
+  company?: string;
+  area?: string;
+  costCenter?: string;
+  bosses?: string[];
   disabled: boolean;
   __v: number;
 }

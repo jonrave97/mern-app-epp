@@ -402,66 +402,73 @@ const PermissionPanel: React.FC = () => {
         
         {/* Paginación */}
         {totalPages > 1 && (
-          <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
-            <div className="flex items-center justify-between">
-              <div className="text-sm text-gray-600">
-                Mostrando {startIndex + 1} a {Math.min(startIndex + itemsPerPage, filteredUsers.length)} de {filteredUsers.length} usuarios
-              </div>
-              <div className="flex items-center space-x-1">
-                {/* Botón anterior */}
-                <button
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                    currentPage === 1
-                      ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                      : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 shadow-sm'
-                  }`}
-                >
-                  Anterior
-                </button>
-                
-                {/* Números de página */}
-                {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+          <div className="mt-6 flex items-center justify-between bg-white px-6 py-4 rounded-lg shadow">
+            {/* Información de página */}
+            <div className="text-sm text-gray-700">
+              Mostrando página <span className="font-medium">{currentPage}</span> de{' '}
+              <span className="font-medium">{totalPages}</span>
+              {' '}({filteredUsers.length} {filteredUsers.length === 1 ? 'elemento' : 'elementos'} en total)
+            </div>
+
+            {/* Botones de navegación */}
+            <div className="flex gap-2">
+              {/* Botón Anterior */}
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className={`px-4 py-2 rounded-lg font-medium transition ${
+                  currentPage === 1
+                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                    : 'bg-primary text-white hover:bg-primary-hover cursor-pointer'
+                }`}
+                aria-label="Página anterior"
+              >
+                ← Anterior
+              </button>
+
+              {/* Números de página */}
+              <div className="flex gap-1">
+                {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
                   let pageNum;
-                  if (totalPages <= 7) {
+                  if (totalPages <= 5) {
                     pageNum = i + 1;
-                  } else if (currentPage <= 4) {
+                  } else if (currentPage <= 3) {
                     pageNum = i + 1;
-                  } else if (currentPage >= totalPages - 3) {
-                    pageNum = totalPages - 6 + i;
+                  } else if (currentPage >= totalPages - 2) {
+                    pageNum = totalPages - 4 + i;
                   } else {
-                    pageNum = currentPage - 3 + i;
+                    pageNum = currentPage - 2 + i;
                   }
                   
                   return (
                     <button
                       key={pageNum}
                       onClick={() => handlePageChange(pageNum)}
-                      className={`px-3 py-2 rounded-lg text-sm font-medium transition ${
+                      className={`px-3 py-2 rounded-lg font-medium transition ${
                         currentPage === pageNum
-                          ? 'bg-primary text-white shadow-lg'
-                          : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 shadow-sm'
+                          ? 'bg-primary text-white hover:bg-primary-hover'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                     >
                       {pageNum}
                     </button>
                   );
                 })}
-                
-                {/* Botón siguiente */}
-                <button
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                    currentPage === totalPages
-                      ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                      : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 shadow-sm'
-                  }`}
-                >
-                  Siguiente
-                </button>
               </div>
+
+              {/* Botón Siguiente */}
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className={`px-4 py-2 rounded-lg font-medium transition ${
+                  currentPage === totalPages
+                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                    : 'bg-primary text-white hover:bg-primary-hover cursor-pointer'
+                }`}
+                aria-label="Página siguiente"
+              >
+                Siguiente →
+              </button>
             </div>
           </div>
         )}

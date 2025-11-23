@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useUsers } from '@hooks/api/useUsers';
-import { createUser, updateUser } from '@services/userService';
+import { createUser, updateUser, getJefaturaUsers } from '@services/userService';
 import { useModal } from '@hooks/modal/useModal';
 import { useCrudActions } from '@hooks/crud/useCrudActions';
 import { Modal } from '@components/shared/Modal';
 import { ModalActions } from '@components/shared/ModalActions';
 import { Pagination } from '@components/shared/Pagination';
+import { MultiSearchableSelect } from '@components/shared/MultiSearchableSelect';
 import { UserForm } from '@components/forms/UserForm';
 import { EditIcon, LockIcon } from '@components/icons';
 import { usePageTitle } from '@hooks/page/usePageTitle';
@@ -17,13 +18,40 @@ function UserListPage() {
   const createModal = useModal<User>();
   const editModal = useModal<User>();
   const toggleStatusModal = useModal<User>();
+  const bossesModal = useModal<User>();
   const { actionError, successMessage, clearMessages, handleError, handleSuccess } = useCrudActions();
   const [actionLoading, setActionLoading] = useState(false);
+  const [jefaturaUsers, setJefaturaUsers] = useState<any[]>([]);
+  const [loadingJefatura, setLoadingJefatura] = useState(false);
+  const [selectedBosses, setSelectedBosses] = useState<string[]>([]);
 
   // Forzar actualización al montar el componente para asegurar datos frescos
   useEffect(() => {
     refresh();
+    loadJefaturaUsers();
   }, []);
+
+  // Cargar jefatura users
+  const loadJefaturaUsers = async () => {
+    try {
+      setLoadingJefatura(true);
+      const response = await getJefaturaUsers();
+      if (response.users) {
+        setJefaturaUsers(response.users.filter((user: any) => !user.disabled));
+      }
+    } catch (error) {
+      console.error('Error al cargar jefatura users:', error);
+    } finally {
+      setLoadingJefatura(false);
+    }
+  };
+
+  // Actualizar selectedBosses cuando se abre el modal
+  useEffect(() => {
+    if (bossesModal.isOpen && bossesModal.selectedItem?.bosses) {
+      setSelectedBosses(bossesModal.selectedItem.bosses);
+    }
+  }, [bossesModal.isOpen, bossesModal.selectedItem]);
 
   const isInitialLoading = loading && users.length === 0 && !searchTerm;
 
@@ -67,6 +95,22 @@ function UserListPage() {
       handleSuccess(`Usuario ${newStatus ? 'desactivado' : 'activado'} exitosamente`);
     } catch (error: unknown) {
       handleError(error, 'Error al cambiar el estado del usuario');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleUpdateBosses = async (bosses: string[]) => {
+    if (!bossesModal.selectedItem) return;
+    setActionLoading(true);
+    clearMessages();
+    try {
+      await updateUser(bossesModal.selectedItem._id, { bosses });
+      bossesModal.close();
+      await refresh();
+      handleSuccess('Jefes asignados exitosamente');
+    } catch (error: unknown) {
+      handleError(error, 'Error al actualizar jefes');
     } finally {
       setActionLoading(false);
     }
@@ -236,6 +280,13 @@ function UserListPage() {
                         <EditIcon className="w-5 h-5" />
                       </button>
                       <button 
+                        onClick={() => bossesModal.open(user)}
+                        className="text-blue-500 hover:text-blue-700 transition-colors p-1 hover:bg-blue-50 rounded cursor-pointer"
+                        title="Asignar jefes"
+                      >
+                        👔
+                      </button>
+                      <button 
                         onClick={() => toggleStatusModal.open(user)}
                         className={`transition-colors p-1 rounded cursor-pointer ${
                           user.disabled
@@ -308,6 +359,8 @@ function UserListPage() {
               name: editModal.selectedItem.name,
               email: editModal.selectedItem.email,
               rol: editModal.selectedItem.rol,
+              area: editModal.selectedItem.area,
+              costCenter: editModal.selectedItem.costCenter,
               company: editModal.selectedItem.company
             }}
             isEditing={true}
@@ -345,6 +398,47 @@ function UserListPage() {
               isLoading={actionLoading}
               loadingText={toggleStatusModal.selectedItem.disabled ? 'Activando...' : 'Desactivando...'}
               confirmVariant={toggleStatusModal.selectedItem.disabled ? 'success' : 'danger'}
+            />
+          </div>
+        )}
+      </Modal>
+
+      {/* Modal Asignar Jefes */}
+      <Modal
+        isOpen={bossesModal.isOpen}
+        onClose={bossesModal.close}
+        title={`Asignar Jefes - ${bossesModal.selectedItem?.name}`}
+        size="md"
+      >
+        {actionError && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4">
+            ❌ {actionError}
+          </div>
+        )}
+        {bossesModal.selectedItem && (
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Selecciona los jefes para {bossesModal.selectedItem.name}
+              </label>
+              <MultiSearchableSelect
+                options={jefaturaUsers.map(user => ({
+                  value: user._id,
+                  label: user.name,
+                  subtitle: user.email
+                }))}
+                value={selectedBosses}
+                onChange={setSelectedBosses}
+                placeholder="Seleccionar jefes..."
+                loading={loadingJefatura}
+              />
+            </div>
+            <ModalActions
+              onCancel={bossesModal.close}
+              onConfirm={() => handleUpdateBosses(selectedBosses)}
+              confirmText="Guardar Jefes"
+              isLoading={actionLoading}
+              loadingText="Guardando..."
             />
           </div>
         )}
