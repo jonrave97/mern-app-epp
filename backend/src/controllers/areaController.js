@@ -58,7 +58,7 @@ export const createArea = async (req, res) => {
 
         const area = new Area({
             name,
-            costCenter,
+            costCenter: costCenter.toUpperCase(),
             disabled: false
         });
 
@@ -94,7 +94,7 @@ export const updateArea = async (req, res) => {
 
         // Actualizar campos
         if (name !== undefined) area.name = name;
-        if (costCenter !== undefined) area.costCenter = costCenter;
+        if (costCenter !== undefined) area.costCenter = costCenter.toUpperCase();
         if (disabled !== undefined) area.disabled = disabled;
 
         await area.save();

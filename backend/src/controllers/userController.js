@@ -1,5 +1,6 @@
 import User from "../models/userModel.js";
 import Company from "../models/companyModel.js";
+import Area from "../models/areaModel.js";
 import bcrypt from "bcrypt";
 import jsonwebtoken from "jsonwebtoken";
 import { getUserbyEmailWithPassword } from "../services/userServices.js";
@@ -47,7 +48,7 @@ export const getAllUsers = async (req, res) => {
 // Crear un nuevo usuario
 export const createUser = async (req, res) => {
   try {
-    const { name, email, password, rol, company } = req.body;
+    const { name, email, password, rol, company, area } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({ 
@@ -61,6 +62,16 @@ export const createUser = async (req, res) => {
       if (!companyExists) {
         return res.status(400).json({ 
           message: "La empresa seleccionada no es válida o está inactiva" 
+        });
+      }
+    }
+
+    // Validar que el área exista si se proporciona
+    if (area) {
+      const areaExists = await Area.findOne({ name: area, disabled: { $ne: true } });
+      if (!areaExists) {
+        return res.status(400).json({ 
+          message: "El área seleccionada no es válida o está inactiva" 
         });
       }
     }
@@ -80,7 +91,8 @@ export const createUser = async (req, res) => {
       email: email.trim().toLowerCase(),
       password: hashedPassword,
       rol: rol || 'usuario',
-      company: company || undefined
+      company: company || undefined,
+      area: area || undefined
     });
 
     await newUser.save();
@@ -111,7 +123,7 @@ export const createUser = async (req, res) => {
 export const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, email, password, rol, disabled, company } = req.body;
+    const { name, email, password, rol, disabled, company, area } = req.body;
 
     const user = await User.findById(id);
     if (!user) {
@@ -124,6 +136,16 @@ export const updateUser = async (req, res) => {
       if (!companyExists) {
         return res.status(400).json({ 
           message: "La empresa seleccionada no es válida o está inactiva" 
+        });
+      }
+    }
+
+    // Validar que el área exista si se proporciona
+    if (area) {
+      const areaExists = await Area.findOne({ name: area, disabled: { $ne: true } });
+      if (!areaExists) {
+        return res.status(400).json({ 
+          message: "El área seleccionada no es válida o está inactiva" 
         });
       }
     }
@@ -142,6 +164,7 @@ export const updateUser = async (req, res) => {
     if (rol) user.rol = rol;
     if (disabled !== undefined) user.disabled = disabled;
     if (company !== undefined) user.company = company || undefined;
+    if (area !== undefined) user.area = area || undefined;
     
     if (password) {
       const salt = await bcrypt.genSalt(10);
