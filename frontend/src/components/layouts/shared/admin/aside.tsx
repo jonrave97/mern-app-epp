@@ -31,7 +31,7 @@ export default function Aside({ sidebarOpen }: { sidebarOpen: boolean }) {
               <span className="ms-3">Dashboard</span>
             </a>
           </li>
-          <li className="px-3">
+          <li className="px-3 mb-0">
             <button
               type="button"
               onClick={() => toggleDropdown('users')}

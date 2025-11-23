@@ -6,9 +6,11 @@ import { ModalActions } from '@components/shared/ModalActions';
 import { Pagination } from '@components/shared/Pagination';
 import { WarehouseForm } from '@components/forms/WarehouseForm';
 import { EditIcon, LockIcon } from '@components/icons';
+import { usePageTitle } from '@hooks/page/usePageTitle';
 import type { Warehouses } from '../../../types/warehouses';
 
 function WarehouseListPage() {
+  usePageTitle('Bodegas');
   const { warehouses, loading, error, pagination, stats, currentPage, goToPage, nextPage, prevPage, refresh } = useWarehouses(1, 10);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);

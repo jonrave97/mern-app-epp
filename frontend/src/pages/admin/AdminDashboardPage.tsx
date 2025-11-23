@@ -1,4 +1,8 @@
+import { usePageTitle } from '@hooks/page/usePageTitle';
+
 function AdminDashboardPage() {
+    usePageTitle('Dashboard');
+
     return (
         /*
             admin dashboard content goes here

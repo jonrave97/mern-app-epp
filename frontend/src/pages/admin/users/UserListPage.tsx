@@ -6,9 +6,11 @@ import { ModalActions } from '@components/shared/ModalActions';
 import { Pagination } from '@components/shared/Pagination';
 import { UserForm } from '@components/forms/UserForm';
 import { EditIcon, LockIcon } from '@components/icons';
+import { usePageTitle } from '@hooks/page/usePageTitle';
 import type { User } from '../../../types/user';
 
 function UserListPage() {
+  usePageTitle('Usuarios');
   const { users, loading, error, pagination, stats, currentPage, goToPage, nextPage, prevPage, refresh } = useUsers(1, 10);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
