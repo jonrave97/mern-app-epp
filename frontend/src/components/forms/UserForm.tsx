@@ -1,18 +1,75 @@
+import { useState, useEffect } from 'react';
 import { useForm } from '@hooks/form/useForm';
 import { ModalActions } from '@components/shared/ModalActions';
+import { SearchableSelect } from '@components/shared/SearchableSelect';
+import { getCompanies } from '@services/companyService';
+import { getAreas } from '@services/areaService';
+
+interface Company {
+  _id: string;
+  name: string;
+  costCenter?: string;
+  disabled?: boolean;
+}
+
+interface Area {
+  _id: string;
+  name: string;
+  costCenter: string;
+  disabled?: boolean;
+}
 
 interface UserFormProps {
-  onSubmit: (data: { name: string; email: string; password?: string; rol?: string }) => Promise<void>;
+  onSubmit: (data: { name: string; email: string; password?: string; rol?: string; company?: string; area?: string; costCenter?: string }) => Promise<void>;
   onCancel: () => void;
   initialData?: {
     name: string;
     email: string;
     rol?: string;
+    company?: string;
+    area?: string;
+    costCenter?: string;
   };
   isEditing?: boolean;
 }
 
 export function UserForm({ onSubmit, onCancel, initialData, isEditing = false }: UserFormProps) {
+  const [companies, setCompanies] = useState<Company[]>([]);
+  const [loadingCompanies, setLoadingCompanies] = useState(true);
+  const [areas, setAreas] = useState<Area[]>([]);
+  const [loadingAreas, setLoadingAreas] = useState(true);
+
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      try {
+        const response = await getCompanies(1, 100);
+        if (response.data) {
+          setCompanies(response.data.filter((company: Company) => !company.disabled));
+        }
+      } catch (error) {
+        console.error('Error al cargar empresas:', error);
+      } finally {
+        setLoadingCompanies(false);
+      }
+    };
+
+    const fetchAreas = async () => {
+      try {
+        const response = await getAreas(1, 100);
+        if (response.areas) {
+          setAreas(response.areas.filter((area: Area) => !area.disabled));
+        }
+      } catch (error) {
+        console.error('Error al cargar áreas:', error);
+      } finally {
+        setLoadingAreas(false);
+      }
+    };
+
+    fetchCompanies();
+    fetchAreas();
+  }, []);
+
   const {
     values,
     errors,
@@ -27,6 +84,9 @@ export function UserForm({ onSubmit, onCancel, initialData, isEditing = false }:
       email: initialData?.email || '',
       password: '',
       rol: initialData?.rol || 'usuario',
+      company: initialData?.company || '',
+      area: initialData?.area || '',
+      costCenter: initialData?.costCenter || '',
     },
     validationRules: {
       name: {
@@ -48,10 +108,13 @@ export function UserForm({ onSubmit, onCancel, initialData, isEditing = false }:
           },
     },
     onSubmit: async (data) => {
-      const submitData: { name: string; email: string; password?: string; rol?: string } = {
+      const submitData: { name: string; email: string; password?: string; rol?: string; company?: string; area?: string; costCenter?: string } = {
         name: data.name,
         email: data.email,
         rol: data.rol,
+        company: data.company,
+        area: data.area,
+        costCenter: data.costCenter,
       };
       // Solo incluir contraseña si se proporcionó
       if (data.password) {
@@ -109,6 +172,67 @@ export function UserForm({ onSubmit, onCancel, initialData, isEditing = false }:
         )}
       </div>
 
+      {/* Empresa */}
+      <div>
+        <label htmlFor="company" className="block text-sm font-medium text-gray-700 mb-1">
+          Empresa
+        </label>
+        <SearchableSelect
+          options={companies.map(company => ({
+            value: company.name,
+            label: company.name
+          }))}
+          value={values.company}
+          onChange={(value) => handleChange('company', value)}
+          onBlur={() => handleBlur('company')}
+          placeholder="Seleccionar empresa"
+          loading={loadingCompanies}
+        />
+      </div>
+
+      {/* Área */}
+      <div>
+        <label htmlFor="area" className="block text-sm font-medium text-gray-700 mb-1">
+          Área
+        </label>
+        <SearchableSelect
+          options={areas.map(area => ({
+            value: area.name,
+            label: area.name,
+            subtitle: area.costCenter
+          }))}
+          value={values.area}
+          onChange={(value) => {
+            const selectedArea = areas.find(area => area.name === value);
+            handleChange('area', value);
+            if (selectedArea) {
+              handleChange('costCenter', selectedArea.costCenter);
+            } else {
+              handleChange('costCenter', '');
+            }
+          }}
+          onBlur={() => handleBlur('area')}
+          placeholder="Seleccionar área"
+          loading={loadingAreas}
+        />
+      </div>
+
+      {/* Centro de Costo (readonly, se actualiza automáticamente) */}
+      <div>
+        <label htmlFor="costCenter" className="block text-sm font-medium text-gray-700 mb-1">
+          Centro de Costo
+        </label>
+        <input
+          type="text"
+          id="costCenter"
+          value={values.costCenter}
+          readOnly
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed"
+          placeholder="Se asigna automáticamente al seleccionar área"
+        />
+        <p className="mt-1 text-xs text-gray-500">Se asigna automáticamente al seleccionar un área</p>
+      </div>
+
       {/* Contraseña */}
       <div>
         <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
@@ -143,7 +267,7 @@ export function UserForm({ onSubmit, onCancel, initialData, isEditing = false }:
           value={values.rol}
           onChange={(e) => handleChange('rol', e.target.value)}
           onBlur={() => handleBlur('rol')}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-300"
         >
           <option value="usuario">Usuario</option>
           <option value="admin">Administrador</option>

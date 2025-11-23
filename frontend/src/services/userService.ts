@@ -1,9 +1,20 @@
 import API from './api';
 
-// Obtener todos los usuarios con paginación
-export const getUsers = async (page = 1, limit = 10) => {
+/**
+ * Obtener todos los usuarios con paginación y búsqueda
+ * @param {number} page - Número de página
+ * @param {number} limit - Elementos por página
+ * @param {string} search - Término de búsqueda por nombre o email
+ * @returns {Promise} Respuesta con usuarios, paginación y estadísticas
+ */
+export const getUsers = async (page = 1, limit = 10, search = '') => {
   try {
-    const response = await API.get(`/users?page=${page}&limit=${limit}`);
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+      ...(search && { search })
+    });
+    const response = await API.get(`/users?${params}`);
     return response.data;
   } catch (error) {
     console.error('Error al obtener usuarios:', error);

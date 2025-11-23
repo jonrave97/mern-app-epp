@@ -12,4 +12,5 @@ export {default as DashboardIcon } from './Dashboard';
 export {default as  UsersIcon } from './Users';
 export {default as EppsIcon } from './Epps';
 export {default as ChevronDownIcon } from './ChevronDown';
+export {default as SearchIcon } from './Search';
 

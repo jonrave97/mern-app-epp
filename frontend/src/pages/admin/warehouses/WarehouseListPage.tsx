@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useWarehouses } from '@hooks/api/useWarehouses';
 import { createWarehouse, updateWarehouse } from '@services/warehouseService';
+import { useModal } from '@hooks/modal/useModal';
+import { useCrudActions } from '@hooks/crud/useCrudActions';
 import { Modal } from '@components/shared/Modal';
 import { ModalActions } from '@components/shared/ModalActions';
 import { Pagination } from '@components/shared/Pagination';
@@ -11,86 +13,58 @@ import type { Warehouses } from '../../../types/warehouses';
 
 function WarehouseListPage() {
   usePageTitle('Bodegas');
-  const { warehouses, loading, error, pagination, stats, currentPage, goToPage, nextPage, prevPage, refresh } = useWarehouses(1, 10);
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedWarehouse, setSelectedWarehouse] = useState<Warehouses | null>(null);
+  const { warehouses, loading, error, pagination, stats, currentPage, searchTerm, setSearchTerm, goToPage, nextPage, prevPage, refresh } = useWarehouses(1, 10);
+  const createModal = useModal<Warehouses>();
+  const editModal = useModal<Warehouses>();
+  const toggleStatusModal = useModal<Warehouses>();
+  const { actionError, successMessage, clearMessages, handleError, handleSuccess } = useCrudActions();
   const [actionLoading, setActionLoading] = useState(false);
-  const [actionError, setActionError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  if (loading && warehouses.length === 0) return <div className="p-4">Cargando bodegas...</div>;
+  const isInitialLoading = loading && warehouses.length === 0 && !searchTerm;
+
+  if (isInitialLoading) return <div className="p-4">Cargando bodegas...</div>;
   if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
 
   const handleCreateWarehouse = async (data: { code: string; name: string }) => {
-    setActionError(null);
+    clearMessages();
     try {
       await createWarehouse(data);
-      setIsCreateModalOpen(false);
+      createModal.close();
       await refresh();
-      setSuccessMessage('Bodega creada exitosamente');
-      setTimeout(() => setSuccessMessage(null), 3000);
+      handleSuccess('Bodega creada exitosamente');
     } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
-      setActionError(err.response?.data?.message || 'Error al crear bodega');
+      handleError(error, 'Error al crear bodega');
     }
   };
 
   const handleUpdateWarehouse = async (data: { code: string; name: string }) => {
-    if (!selectedWarehouse) return;
-    setActionError(null);
+    if (!editModal.selectedItem) return;
+    clearMessages();
     try {
-      await updateWarehouse(selectedWarehouse._id, data);
-      setIsEditModalOpen(false);
-      setSelectedWarehouse(null);
-      await refresh(); //forza refresco de datos después de actualizar el almacén
-      setSuccessMessage('Bodega actualizada exitosamente');
-      setTimeout(() => setSuccessMessage(null), 3000);
+      await updateWarehouse(editModal.selectedItem._id, data);
+      editModal.close();
+      await refresh();
+      handleSuccess('Bodega actualizada exitosamente');
     } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
-      setActionError(err.response?.data?.message || 'Error al actualizar bodega');
+      handleError(error, 'Error al actualizar bodega');
     }
   };
 
   const handleToggleWarehouseStatus = async () => {
-    if (!selectedWarehouse) return;
+    if (!toggleStatusModal.selectedItem) return;
     setActionLoading(true);
-    setActionError(null);
+    clearMessages();
     try {
-      const newStatus = !selectedWarehouse.disabled;
-      await updateWarehouse(selectedWarehouse._id, { disabled: newStatus });
-      setIsDeleteModalOpen(false);
-      setSelectedWarehouse(null);
-      await refresh(); // forzar refresco de datos después de cambiar el estado
-      setSuccessMessage(`Bodega ${newStatus ? 'desactivada' : 'activada'} exitosamente`);
-      setTimeout(() => setSuccessMessage(null), 3000);
+      const newStatus = !toggleStatusModal.selectedItem.disabled;
+      await updateWarehouse(toggleStatusModal.selectedItem._id, { disabled: newStatus });
+      toggleStatusModal.close();
+      await refresh();
+      handleSuccess(`Bodega ${newStatus ? 'desactivada' : 'activada'} exitosamente`);
     } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
-      setActionError(err.response?.data?.message || 'Error al cambiar el estado de la bodega');
+      handleError(error, 'Error al cambiar el estado de la bodega');
     } finally {
       setActionLoading(false);
     }
-  };
-
-  const openEditModal = (warehouse: Warehouses) => {
-    setSelectedWarehouse(warehouse);
-    setIsEditModalOpen(true);
-    setActionError(null);
-  };
-
-  const openToggleStatusModal = (warehouse: Warehouses) => {
-    setSelectedWarehouse(warehouse);
-    setIsDeleteModalOpen(true);
-    setActionError(null);
-  };
-
-  const closeModals = () => {
-    setIsCreateModalOpen(false);
-    setIsEditModalOpen(false);
-    setIsDeleteModalOpen(false);
-    setSelectedWarehouse(null);
-    setActionError(null);
   };
 
   const totalWarehouses = stats?.total || 0;
@@ -106,7 +80,7 @@ function WarehouseListPage() {
           <p className="text-gray-600">Gestiona todas las bodegas del sistema</p>
         </div>
         <button
-          onClick={() => setIsCreateModalOpen(true)}
+          onClick={() => createModal.open()}
           className="px-3 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition font-medium shadow-lg hover:shadow-xl cursor-pointer"
         >
           + Nueva Bodega
@@ -158,6 +132,43 @@ function WarehouseListPage() {
         </div>
       </div>
 
+      {/* Campo de búsqueda */}
+      <div className="mb-6">
+        <div className="relative max-w-md">
+          <input
+            type="text"
+            placeholder="Buscar por nombre o código..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+          />
+          <svg
+            className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+        </div>
+      </div>
+
+      {/* Indicador de búsqueda */}
+      {loading && searchTerm.trim() !== '' && (
+        <div className="bg-orange-50 border border-orange-200 px-4 py-2 text-orange-700 text-sm rounded-lg my-4 flex items-center gap-2 animate-fade-in">
+          <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Buscando...
+        </div>
+      )}
+
       {/* Mensaje de éxito */}
       {successMessage && (
         <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-4">
@@ -203,14 +214,14 @@ function WarehouseListPage() {
                   <td className="px-6 py-4">
                     <div className="flex gap-3">
                       <button 
-                        onClick={() => openEditModal(warehouse)}
+                        onClick={() => editModal.open(warehouse)}
                         className="text-gray-500 hover:text-gray-700 transition-colors p-1 hover:bg-gray-50 rounded cursor-pointer"
                         title="Editar bodega"
                       >
                         <EditIcon className="w-5 h-5" />
                       </button>
                       <button 
-                        onClick={() => openToggleStatusModal(warehouse)}
+                        onClick={() => toggleStatusModal.open(warehouse)}
                         className={`transition-colors p-1 rounded cursor-pointer ${
                           warehouse.disabled
                             ? 'text-green-600 hover:text-green-700 hover:bg-green-50'
@@ -246,8 +257,8 @@ function WarehouseListPage() {
 
       {/* Modal Crear Bodega */}
       <Modal
-        isOpen={isCreateModalOpen}
-        onClose={closeModals}
+        isOpen={createModal.isOpen}
+        onClose={createModal.close}
         title="Crear Nueva Bodega"
         size="md"
       >
@@ -258,14 +269,14 @@ function WarehouseListPage() {
         )}
         <WarehouseForm
           onSubmit={handleCreateWarehouse}
-          onCancel={closeModals}
+          onCancel={createModal.close}
         />
       </Modal>
 
       {/* Modal Editar Bodega */}
       <Modal
-        isOpen={isEditModalOpen}
-        onClose={closeModals}
+        isOpen={editModal.isOpen}
+        onClose={editModal.close}
         title="Editar Bodega"
         size="md"
       >
@@ -274,13 +285,13 @@ function WarehouseListPage() {
             ❌ {actionError}
           </div>
         )}
-        {selectedWarehouse && (
+        {editModal.selectedItem && (
           <WarehouseForm
             onSubmit={handleUpdateWarehouse}
-            onCancel={closeModals}
+            onCancel={editModal.close}
             initialData={{
-              code: selectedWarehouse.code,
-              name: selectedWarehouse.name
+              code: editModal.selectedItem.code,
+              name: editModal.selectedItem.name
             }}
             isEditing={true}
           />
@@ -289,9 +300,9 @@ function WarehouseListPage() {
 
       {/* Modal Confirmar Cambio de Estado */}
       <Modal
-        isOpen={isDeleteModalOpen}
-        onClose={closeModals}
-        title={selectedWarehouse?.disabled ? 'Activar Bodega' : 'Desactivar Bodega'}
+        isOpen={toggleStatusModal.isOpen}
+        onClose={toggleStatusModal.close}
+        title={toggleStatusModal.selectedItem?.disabled ? 'Activar Bodega' : 'Desactivar Bodega'}
         size="sm"
       >
         {actionError && (
@@ -299,25 +310,25 @@ function WarehouseListPage() {
             ❌ {actionError}
           </div>
         )}
-        {selectedWarehouse && (
+        {toggleStatusModal.selectedItem && (
           <div>
             <p className="text-gray-700 mb-6">
-              ¿Estás seguro de que deseas {selectedWarehouse.disabled ? 'activar' : 'desactivar'} la bodega{' '}
-              <span className="font-bold">{selectedWarehouse.name}</span> (
-              {selectedWarehouse.code})?
+              ¿Estás seguro de que deseas {toggleStatusModal.selectedItem.disabled ? 'activar' : 'desactivar'} la bodega{' '}
+              <span className="font-bold">{toggleStatusModal.selectedItem.name}</span> (
+              {toggleStatusModal.selectedItem.code})?
             </p>
-            {!selectedWarehouse.disabled && (
+            {!toggleStatusModal.selectedItem.disabled && (
               <p className="text-sm text-amber-600 mb-6">
                 ⚠️ La bodega quedará inactiva pero no se eliminará.
               </p>
             )}
             <ModalActions
-              onCancel={closeModals}
+              onCancel={toggleStatusModal.close}
               onConfirm={handleToggleWarehouseStatus}
-              confirmText={selectedWarehouse.disabled ? 'Activar' : 'Desactivar'}
+              confirmText={toggleStatusModal.selectedItem.disabled ? 'Activar' : 'Desactivar'}
               isLoading={actionLoading}
-              loadingText={selectedWarehouse.disabled ? 'Activando...' : 'Desactivando...'}
-              confirmVariant={selectedWarehouse.disabled ? 'success' : 'danger'}
+              loadingText={toggleStatusModal.selectedItem.disabled ? 'Activando...' : 'Desactivando...'}
+              confirmVariant={toggleStatusModal.selectedItem.disabled ? 'success' : 'danger'}
             />
           </div>
         )}

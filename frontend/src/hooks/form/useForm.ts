@@ -5,6 +5,8 @@ interface ValidationRules<T> {
     required?: boolean;
     minLength?: number;
     maxLength?: number;
+    min?: number;
+    max?: number;
     pattern?: RegExp;
     custom?: (value: unknown, allValues: T) => string | undefined;
   };
@@ -55,6 +57,14 @@ export const useForm = <T extends Record<string, unknown>>({
 
     if (rules.maxLength && value?.toString() && value.toString().length > rules.maxLength) {
       return `No puede exceder ${rules.maxLength} caracteres`;
+    }
+
+    if (rules.min !== undefined && typeof value === 'number' && value < rules.min) {
+      return `El valor mínimo es ${rules.min}`;
+    }
+
+    if (rules.max !== undefined && typeof value === 'number' && value > rules.max) {
+      return `El valor máximo es ${rules.max}`;
     }
 
     if (rules.pattern && !rules.pattern.test(value?.toString() || '')) {

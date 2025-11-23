@@ -69,10 +69,10 @@ export default function Aside({ sidebarOpen }: { sidebarOpen: boolean }) {
               </li>
               <li>
                 <a
-                  href="#"
+                  href="/admin/positions"
                   className="pl-10 flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group"
                 >
-                  Roles
+                  Posiciones
                 </a>
               </li>
             </ul>
@@ -114,7 +114,7 @@ export default function Aside({ sidebarOpen }: { sidebarOpen: boolean }) {
 
           <li className="px-3 hover:bg-gray-200 hover:rounded-base transition border border-transparent hover:border-gray-200">
             <a
-              href="#"
+              href="/admin/epps"
               className="flex items-center px-2 py-1.5 text-body rounded-base hover:text-fg-brand group"
             >
               <EppsIcon className="shrink-0 w-5 h-5 transition duration-75 group-hover:text-fg-brand" />

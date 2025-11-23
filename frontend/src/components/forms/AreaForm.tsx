@@ -34,7 +34,7 @@ export const AreaForm = ({ onSubmit, onCancel, initialData, isEditing = false }:
       },
       costCenter: {
         required: true,
-        pattern: /^[A-Z]{2}_\d{4}$/,
+        pattern: /^[A-Z0-9_]+$/,
       }
     },
     onSubmit: async (data) => {
@@ -80,10 +80,10 @@ export const AreaForm = ({ onSubmit, onCancel, initialData, isEditing = false }:
           onChange={(e) => handleChange('costCenter', e.target.value)}
           onBlur={() => handleBlur('costCenter')}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-          placeholder="Ej: CL_0001, US_1234"
+          placeholder="Ej: CL_0001, 1234, ABC123"
         />
         {touched.costCenter && errors.costCenter && (
-          <p className="mt-1 text-sm text-red-600">Formato: 2 letras mayúsculas, guión bajo y 4 dígitos (Ej: CL_0001)</p>
+          <p className="mt-1 text-sm text-red-600">Solo letras mayúsculas, números y guión bajo (Ej: CL_0001, 1234)</p>
         )}
       </div>
 

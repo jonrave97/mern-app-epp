@@ -1,11 +1,19 @@
 import API from './api';
 
-// Obtener todas las bodegas con paginación
-export const getWarehouses = async (page: number = 1, limit: number = 10) => {
+/**
+ * Obtener todas las bodegas con paginación y búsqueda
+ * @param {number} page - Número de página
+ * @param {number} limit - Elementos por página
+ * @param {string} search - Término de búsqueda por nombre o código
+ * @returns {Promise} Respuesta con bodegas, paginación y estadísticas
+ */
+export const getWarehouses = async (page: number = 1, limit: number = 10, search: string = '') => {
   try {
-    const response = await API.get('/warehouses/all', {
-      params: { page, limit }
-    });
+    const params: { page: number; limit: number; search?: string } = { page, limit };
+    if (search) {
+      params.search = search;
+    }
+    const response = await API.get('/warehouses/all', { params });
     // console.log('Bodegas obtenidas:', response.data);
     return response.data;
   } catch (error) {

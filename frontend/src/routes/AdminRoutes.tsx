@@ -7,6 +7,8 @@ import AdminDashboardPage  from '../pages/admin/AdminDashboardPage.tsx';
 import WarehouseListPage from '../pages/admin/warehouses/WarehouseListPage.tsx';
 import CompanyListPage from '../pages/admin/companies/CompanyListPage.tsx';
 import AreaListPage from '../pages/admin/areas/AreaListPage.tsx';
+import PositionListPage from '../pages/admin/positions/PositionListPage.tsx';
+import EppListPage from '../pages/admin/epps/EppListPage.tsx';
 
 function AdminRoutes()
 {
@@ -22,6 +24,8 @@ function AdminRoutes()
                     <Route path='warehouses' element={<WarehouseListPage />} />
                     <Route path='companies' element={<CompanyListPage />} />
                     <Route path='areas' element={<AreaListPage />} />
+                    <Route path='positions' element={<PositionListPage />} />
+                    <Route path='epps' element={<EppListPage />} />
                 </Route>
             </Routes>
         </ProtectedRoute>

@@ -1,103 +1,107 @@
-import { useState } from 'react';
-import { useUsers } from '@hooks/api/useUsers';
-import { createUser, updateUser } from '@services/userService';
+import { usePageTitle } from '@hooks/page/usePageTitle';
+import { useEpps } from '@hooks/api/useEpps';
 import { useModal } from '@hooks/modal/useModal';
 import { useCrudActions } from '@hooks/crud/useCrudActions';
+import { createEpp, updateEpp } from '@services/eppService';
 import { Modal } from '@components/shared/Modal';
 import { ModalActions } from '@components/shared/ModalActions';
 import { Pagination } from '@components/shared/Pagination';
-import { UserForm } from '@components/forms/UserForm';
-import { EditIcon, LockIcon } from '@components/icons';
-import { usePageTitle } from '@hooks/page/usePageTitle';
-import type { User } from '../../../types/user';
+import { EppForm } from '@components/forms/EppForm';
+import { EditIcon, SearchIcon, LockIcon } from '@components/icons';
+import type { Epp } from '../../../types/epp';
+import { useState } from 'react';
 
-function UserListPage() {
-  usePageTitle('Usuarios');
-  const { users, loading, error, pagination, stats, currentPage, searchTerm, setSearchTerm, goToPage, nextPage, prevPage, refresh } = useUsers(1, 10);
-  const createModal = useModal<User>();
-  const editModal = useModal<User>();
-  const toggleStatusModal = useModal<User>();
+function EppListPage() {
+  usePageTitle('EPPs');
+  const { epps, loading, error, stats, pagination, currentPage, searchTerm, setSearchTerm, nextPage, prevPage, goToPage, refresh } = useEpps(1, 10);
+  const createModal = useModal<Epp>();
+  const editModal = useModal<Epp>();
+  const toggleStatusModal = useModal<Epp>();
   const { actionError, successMessage, clearMessages, handleError, handleSuccess } = useCrudActions();
   const [actionLoading, setActionLoading] = useState(false);
 
-  const isInitialLoading = loading && users.length === 0 && !searchTerm;
+  // Solo mostrar pantalla de carga completa en la primera carga
+  const isInitialLoading = loading && epps.length === 0 && !searchTerm;
+  
+  if (isInitialLoading) return <div className="p-4">Cargando EPPs...</div>;
+  if (error && epps.length === 0) return <div className="p-4 text-red-500">Error: {error}</div>;
 
-  if (isInitialLoading) return <div className="p-4">Cargando usuarios...</div>;
-  if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
-
-  const handleCreateUser = async (data: { name: string; email: string; password?: string; rol?: string; company?: string }) => {
+  const handleCreateEpp = async (data: { code: string; name: string; price: number; category: string }) => {
     clearMessages();
     try {
-      await createUser(data as { name: string; email: string; password: string; rol?: string; company?: string });
+      await createEpp(data);
       createModal.close();
       await refresh();
-      handleSuccess('Usuario creado exitosamente');
+      handleSuccess('EPP creado exitosamente');
     } catch (error: unknown) {
-      handleError(error, 'Error al crear usuario');
+      handleError(error, 'Error al crear EPP');
     }
   };
 
-  const handleUpdateUser = async (data: { name: string; email: string; password?: string; rol?: string; company?: string }) => {
+  const handleUpdateEpp = async (data: { code: string; name: string; price: number; category: string }) => {
     if (!editModal.selectedItem) return;
     clearMessages();
     try {
-      await updateUser(editModal.selectedItem._id, data);
+      await updateEpp(editModal.selectedItem._id, data);
       editModal.close();
       await refresh();
-      handleSuccess('Usuario actualizado exitosamente');
+      handleSuccess('EPP actualizado exitosamente');
     } catch (error: unknown) {
-      handleError(error, 'Error al actualizar usuario');
+      handleError(error, 'Error al actualizar EPP');
     }
   };
 
-  const handleToggleUserStatus = async () => {
+  const handleToggleEppStatus = async () => {
     if (!toggleStatusModal.selectedItem) return;
     setActionLoading(true);
     clearMessages();
     try {
       const newStatus = !toggleStatusModal.selectedItem.disabled;
-      await updateUser(toggleStatusModal.selectedItem._id, { disabled: newStatus });
+      await updateEpp(toggleStatusModal.selectedItem._id, { disabled: newStatus });
       toggleStatusModal.close();
       await refresh();
-      handleSuccess(`Usuario ${newStatus ? 'desactivado' : 'activado'} exitosamente`);
+      handleSuccess(`EPP ${newStatus ? 'desactivado' : 'activado'} exitosamente`);
     } catch (error: unknown) {
-      handleError(error, 'Error al cambiar el estado del usuario');
+      handleError(error, 'Error al cambiar el estado del EPP');
     } finally {
       setActionLoading(false);
     }
   };
-
-  const totalUsers = stats?.total || 0;
-  const activeUsers = stats?.active || 0;
-  const inactiveUsers = stats?.inactive || 0;
 
   return (
     <div className="p-6 min-h-screen">
       {/* Encabezado */}
       <div className="mb-8 flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Lista de Usuarios</h1>
-          <p className="text-gray-600">Gestiona todos los usuarios del sistema</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Lista de EPPs</h1>
+          <p className="text-gray-600">Gestiona todos los Equipos de Protección Personal</p>
         </div>
         <button
           onClick={() => createModal.open()}
           className="px-3 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition font-medium shadow-lg hover:shadow-xl cursor-pointer"
         >
-          + Nuevo Usuario
+          + Nuevo EPP
         </button>
       </div>
+
+      {/* Mensaje de éxito */}
+      {successMessage && (
+        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-4">
+          ✅ {successMessage}
+        </div>
+      )}
 
       {/* Cards de estadísticas */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-primary">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-500 text-sm font-medium mb-1">Total de Usuarios</p>
-              <h3 className="text-3xl font-bold text-gray-900">{totalUsers}</h3>
+              <p className="text-gray-500 text-sm font-medium mb-1">Total de EPPs</p>
+              <h3 className="text-3xl font-bold text-gray-900">{stats?.total || 0}</h3>
             </div>
             <div className="bg-primary-light p-3 rounded-full">
               <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
               </svg>
             </div>
           </div>
@@ -106,8 +110,8 @@ function UserListPage() {
         <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-green-500">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-500 text-sm font-medium mb-1">Usuarios Activos</p>
-              <h3 className="text-3xl font-bold text-gray-900">{activeUsers}</h3>
+              <p className="text-gray-500 text-sm font-medium mb-1">EPPs Activos</p>
+              <h3 className="text-3xl font-bold text-gray-900">{stats?.active || 0}</h3>
             </div>
             <div className="bg-green-100 p-3 rounded-full">
               <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -120,8 +124,8 @@ function UserListPage() {
         <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-danger">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-500 text-sm font-medium mb-1">Usuarios Inactivos</p>
-              <h3 className="text-3xl font-bold text-gray-900">{inactiveUsers}</h3>
+              <p className="text-gray-500 text-sm font-medium mb-1">EPPs Inactivos</p>
+              <h3 className="text-3xl font-bold text-gray-900">{stats?.inactive || 0}</h3>
             </div>
             <div className="bg-red-100 p-3 rounded-full">
               <svg className="w-8 h-8 text-danger" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -137,28 +141,16 @@ function UserListPage() {
         <div className="relative">
           <input
             type="text"
-            placeholder="Buscar por nombre o email..."
+            placeholder="Buscar EPP por nombre, código o categoría..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-300"
           />
-          <svg
-            className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            />
-          </svg>
+          <SearchIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
         </div>
       </div>
 
-      {/* Indicador de búsqueda */}
+      {/* Indicador de carga durante búsqueda */}
       {loading && searchTerm.trim() !== '' && (
         <div className="bg-orange-50 border border-orange-200 px-4 py-2 text-orange-700 text-sm rounded-lg my-4 flex items-center gap-2 animate-fade-in">
           <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -169,73 +161,68 @@ function UserListPage() {
         </div>
       )}
 
-      {/* Mensaje de éxito */}
-      {successMessage && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-4">
-          ✅ {successMessage}
-        </div>
-      )}
-
       {/* Tabla */}
       <div className="bg-white shadow-2xl rounded-xl overflow-hidden">
         <table className="w-full">
           <thead>
             <tr className="bg-gray-800 text-white">
+              <th className="px-6 py-4 text-left font-semibold">Código</th>
               <th className="px-6 py-4 text-left font-semibold">Nombre</th>
-              <th className="px-6 py-4 text-left font-semibold">Email</th>
-              <th className="px-6 py-4 text-left font-semibold">Rol</th>
+              <th className="px-6 py-4 text-left font-semibold">Categoría</th>
+              <th className="px-6 py-4 text-left font-semibold">Precio</th>
               <th className="px-6 py-4 text-left font-semibold">Estado</th>
               <th className="px-6 py-4 text-left font-semibold">Acciones</th>
             </tr>
           </thead>
           <tbody>
-            {users.length === 0 ? (
+            {epps.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
-                  No hay usuarios disponibles
+                <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                  {loading ? 'Buscando...' : searchTerm ? 'No se encontraron EPPs' : 'No hay EPPs disponibles'}
                 </td>
               </tr>
             ) : (
-              users.map((user: User) => (
+              epps.map((epp: Epp) => (
                 <tr
-                  key={user._id}
+                  key={epp._id}
                   className="border-b border-gray-200 hover:bg-gray-50 transition duration-150"
                 >
-                  <td className="px-6 py-4 text-gray-900 font-medium">{user.name}</td>
-                  <td className="px-6 py-4 text-gray-600">{user.email}</td>
+                  <td className="px-6 py-4 text-gray-900 font-medium">{epp.code}</td>
+                  <td className="px-6 py-4 text-gray-900">{epp.name}</td>
                   <td className="px-6 py-4">
-                    <span className="inline-block bg-primary text-white px-3 py-1 rounded-full text-sm font-medium">
-                      {user.rol || 'usuario'}
+                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm font-medium">
+                      {epp.category}
                     </span>
                   </td>
+                  <td className="px-6 py-4 text-gray-700">${epp.price.toLocaleString('es-CL')}</td>
                   <td className="px-6 py-4">
                     <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
-                      user.disabled 
+                      epp.disabled 
                         ? 'bg-red-100 text-red-800' 
                         : 'bg-green-100 text-green-800'
                     }`}>
-                      {user.disabled ? 'Inactivo' : 'Activo'}
+                      {epp.disabled ? 'Inactivo' : 'Activo'}
                     </span>
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex gap-3">
                       <button 
-                        onClick={() => editModal.open(user)}
+                        onClick={() => editModal.open(epp)}
                         className="text-gray-500 hover:text-gray-700 transition-colors p-1 hover:bg-gray-50 rounded cursor-pointer"
-                        title="Editar usuario"
+                        title="Editar EPP"
                       >
                         <EditIcon className="w-5 h-5" />
                       </button>
                       <button 
-                        onClick={() => toggleStatusModal.open(user)}
+                        onClick={() => toggleStatusModal.open(epp)}
                         className={`transition-colors p-1 rounded cursor-pointer ${
-                          user.disabled
+                          epp.disabled
                             ? 'text-green-600 hover:text-green-700 hover:bg-green-50'
                             : 'text-red-600 hover:text-red-700 hover:bg-red-50'
                         }`}
-                        title={user.disabled ? 'Activar usuario' : 'Desactivar usuario'}
+                        title={epp.disabled ? 'Activar EPP' : 'Desactivar EPP'}
                       >
-                        <LockIcon className="w-5 h-5" isLocked={user.disabled} />
+                        <LockIcon className="w-5 h-5" isLocked={epp.disabled} />
                       </button>
                     </div>
                   </td>
@@ -261,11 +248,11 @@ function UserListPage() {
         />
       )}
 
-      {/* Modal Crear Usuario */}
+      {/* Modal Crear EPP */}
       <Modal
         isOpen={createModal.isOpen}
         onClose={createModal.close}
-        title="Crear Nuevo Usuario"
+        title="Crear Nuevo EPP"
         size="md"
       >
         {actionError && (
@@ -273,17 +260,17 @@ function UserListPage() {
             ❌ {actionError}
           </div>
         )}
-        <UserForm
-          onSubmit={handleCreateUser}
+        <EppForm
+          onSubmit={handleCreateEpp}
           onCancel={createModal.close}
         />
       </Modal>
 
-      {/* Modal Editar Usuario */}
+      {/* Modal Editar EPP */}
       <Modal
         isOpen={editModal.isOpen}
         onClose={editModal.close}
-        title="Editar Usuario"
+        title="Editar EPP"
         size="md"
       >
         {actionError && (
@@ -292,14 +279,14 @@ function UserListPage() {
           </div>
         )}
         {editModal.selectedItem && (
-          <UserForm
-            onSubmit={handleUpdateUser}
+          <EppForm
+            onSubmit={handleUpdateEpp}
             onCancel={editModal.close}
             initialData={{
+              code: editModal.selectedItem.code,
               name: editModal.selectedItem.name,
-              email: editModal.selectedItem.email,
-              rol: editModal.selectedItem.rol,
-              company: editModal.selectedItem.company
+              price: editModal.selectedItem.price,
+              category: editModal.selectedItem.category
             }}
             isEditing={true}
           />
@@ -310,7 +297,7 @@ function UserListPage() {
       <Modal
         isOpen={toggleStatusModal.isOpen}
         onClose={toggleStatusModal.close}
-        title={toggleStatusModal.selectedItem?.disabled ? 'Activar Usuario' : 'Desactivar Usuario'}
+        title={toggleStatusModal.selectedItem?.disabled ? 'Activar EPP' : 'Desactivar EPP'}
         size="sm"
       >
         {actionError && (
@@ -321,17 +308,17 @@ function UserListPage() {
         {toggleStatusModal.selectedItem && (
           <div>
             <p className="text-gray-700 mb-6">
-              ¿Estás seguro de que deseas {toggleStatusModal.selectedItem.disabled ? 'activar' : 'desactivar'} al usuario{' '}
-              <span className="font-bold">{toggleStatusModal.selectedItem.name}</span> ({toggleStatusModal.selectedItem.email})?
+              ¿Estás seguro de que deseas {toggleStatusModal.selectedItem.disabled ? 'activar' : 'desactivar'} el EPP{' '}
+              <span className="font-bold">{toggleStatusModal.selectedItem.name}</span> ({toggleStatusModal.selectedItem.code})?
             </p>
             {!toggleStatusModal.selectedItem.disabled && (
               <p className="text-sm text-amber-600 mb-6">
-                ⚠️ El usuario no podrá acceder al sistema pero sus datos se conservarán.
+                ⚠️ El EPP no estará disponible para asignación pero sus datos se conservarán.
               </p>
             )}
             <ModalActions
               onCancel={toggleStatusModal.close}
-              onConfirm={handleToggleUserStatus}
+              onConfirm={handleToggleEppStatus}
               confirmText={toggleStatusModal.selectedItem.disabled ? 'Activar' : 'Desactivar'}
               isLoading={actionLoading}
               loadingText={toggleStatusModal.selectedItem.disabled ? 'Activando...' : 'Desactivando...'}
@@ -344,4 +331,4 @@ function UserListPage() {
   );
 }
 
-export default UserListPage;
+export default EppListPage;
