@@ -5,6 +5,8 @@ import UserCreatePage from '../pages/admin/users/UserCreatePage.tsx';
 import UserListPage from '../pages/admin/users/UserListPage.tsx';
 import AdminDashboardPage  from '../pages/admin/AdminDashboardPage.tsx';
 import WarehouseListPage from '../pages/admin/warehouses/WarehouseListPage.tsx';
+import CompanyListPage from '../pages/admin/companies/CompanyListPage.tsx';
+import AreaListPage from '../pages/admin/areas/AreaListPage.tsx';
 
 function AdminRoutes()
 {
@@ -18,6 +20,8 @@ function AdminRoutes()
                     <Route path='users' element={<UserListPage />} />
                     <Route path='users/create' element={<UserCreatePage />} />
                     <Route path='warehouses' element={<WarehouseListPage />} />
+                    <Route path='companies' element={<CompanyListPage />} />
+                    <Route path='areas' element={<AreaListPage />} />
                 </Route>
             </Routes>
         </ProtectedRoute>

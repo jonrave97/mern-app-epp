@@ -4,6 +4,7 @@ import {
   UsersIcon,
   EppsIcon,
   ChevronDownIcon,
+  CompanyIcon,
 } from "@components/icons/index";
 import { useDropdowns } from "@hooks/ui/useDropdowns";
 
@@ -86,6 +87,28 @@ export default function Aside({ sidebarOpen }: { sidebarOpen: boolean }) {
               <span className="bg-neutral-secondary-medium border border-default-medium text-heading text-xs font-medium px-1.5 py-0.5 rounded-sm">
                 Pro
               </span>
+            </a>
+          </li>
+
+          <li className="px-3 hover:bg-gray-200 hover:rounded-base transition border border-transparent hover:border-gray-200">
+            <a
+              href="/admin/companies"
+              className="flex items-center px-2 py-1.5 text-body rounded-base hover:text-fg-brand group"
+            >
+              <CompanyIcon className="shrink-0 w-5 h-5 transition duration-75 group-hover:text-fg-brand" />
+              <span className="flex-1 ms-3 whitespace-nowrap">Empresas</span>
+            </a>
+          </li>
+
+          <li className="px-3 hover:bg-gray-200 hover:rounded-base transition border border-transparent hover:border-gray-200">
+            <a
+              href="/admin/areas"
+              className="flex items-center px-2 py-1.5 text-body rounded-base hover:text-fg-brand group"
+            >
+              <svg className="shrink-0 w-5 h-5 transition duration-75 group-hover:text-fg-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+              <span className="flex-1 ms-3 whitespace-nowrap">Áreas</span>
             </a>
           </li>
 
