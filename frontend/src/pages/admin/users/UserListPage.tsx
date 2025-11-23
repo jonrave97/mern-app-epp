@@ -6,7 +6,7 @@ import { useCrudActions } from '@hooks/crud/useCrudActions';
 import { Modal } from '@components/shared/Modal';
 import { ModalActions } from '@components/shared/ModalActions';
 import { Pagination } from '@components/shared/Pagination';
-import { MultiSearchableSelect } from '@components/shared/MultiSearchableSelect';
+import { MultiCheckboxSelect } from '@components/shared/MultiCheckboxSelect';
 import { UserForm } from '@components/forms/UserForm';
 import { EditIcon, LockIcon } from '@components/icons';
 import { usePageTitle } from '@hooks/page/usePageTitle';
@@ -422,7 +422,7 @@ function UserListPage() {
         isOpen={bossesModal.isOpen}
         onClose={bossesModal.close}
         title={`Asignar Jefes - ${bossesModal.selectedItem?.name}`}
-        size="md"
+        size="lg"
       >
         {actionError && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4">
@@ -435,7 +435,7 @@ function UserListPage() {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Selecciona los jefes para {bossesModal.selectedItem.name}
               </label>
-              <MultiSearchableSelect
+              <MultiCheckboxSelect
                 options={jefaturaUsers.map(user => ({
                   value: user._id,
                   label: user.name,

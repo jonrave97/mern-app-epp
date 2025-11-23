@@ -37,7 +37,7 @@ export const Modal = ({ isOpen, onClose, title, children, size = 'md' }: ModalPr
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-start justify-center pt-8">
       {/* Overlay con efecto parallax */}
       <div 
         className="absolute inset-0 bg-linear-to-br from-gray-900/60 via-gray-800/50 to-gray-900/60 backdrop-blur-sm transition-all duration-300"
@@ -50,7 +50,7 @@ export const Modal = ({ isOpen, onClose, title, children, size = 'md' }: ModalPr
 
       {/* Modal Content con fondo suave */}
       <div 
-        className={`relative bg-linear-to-br from-gray-50 via-white to-gray-100 rounded-2xl shadow-2xl w-full ${sizeClasses[size]} mx-4 max-h-[90vh] flex flex-col transform transition-all duration-300 ease-out`}
+        className={`relative bg-linear-to-br from-gray-50 via-white to-gray-100 rounded-2xl shadow-2xl w-full ${sizeClasses[size]} mx-4 max-h-[90vh] flex flex-col transform transition-all duration-300 ease-out overflow-visible`}
         style={{
           backdropFilter: 'blur(20px)',
           border: '1px solid rgba(255, 255, 255, 0.3)',
@@ -70,7 +70,7 @@ export const Modal = ({ isOpen, onClose, title, children, size = 'md' }: ModalPr
         </div>
 
         {/* Body */}
-        <div className="p-6 overflow-y-auto flex-1 bg-white/80">
+        <div className="p-6 overflow-visible flex-1 bg-white/80">
           {children}
         </div>
       </div>
