@@ -74,7 +74,6 @@ function LoginPage() {
                                 id="email"
                                 type="email"
                                 placeholder="correo@correo.com"
-                                
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 autoComplete="email"
@@ -90,13 +89,12 @@ function LoginPage() {
                                 id="password"
                                 type="password"
                                 placeholder="••••••••"
-                                
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 autoComplete="current-password"
                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition duration-200"
                             />
-                        <a href="/forgot-password" className="text-sm  text-gray-600 hover:underline  ">Olvidaste tu contraseña?</a>
+                            <a href="/forgot-password" className="text-sm text-gray-600 hover:underline">Olvidaste tu contraseña?</a>
                         </div>
                         <button
                             type="submit"
