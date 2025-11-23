@@ -45,8 +45,11 @@ export interface User {
   costCenter?: string;
   /** Cargo o posición del usuario (ID como string) */
   position?: string; // ObjectId como string
-  /** Array de IDs de los jefes directos del usuario */
-  bosses?: string[]; // Array de ObjectIds como strings
+  /** Array de jefes/aprobadores del usuario con sus referencias */
+  bosses?: Array<{
+    _id?: string;
+    boss?: string | { _id: string; name: string; email: string };
+  }>;
   /** Token de autenticación JWT (opcional) */
   token?: string;
   /** RUT del usuario (identificación chilena) */

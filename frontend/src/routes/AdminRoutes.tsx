@@ -9,6 +9,7 @@ import CompanyListPage from '../pages/admin/companies/CompanyListPage.tsx';
 import AreaListPage from '../pages/admin/areas/AreaListPage.tsx';
 import PositionListPage from '../pages/admin/positions/PositionListPage.tsx';
 import EppListPage from '../pages/admin/epps/EppListPage.tsx';
+import CategoryListPage from '../pages/admin/categories/CategoryListPage.tsx';
 
 function AdminRoutes()
 {
@@ -26,6 +27,7 @@ function AdminRoutes()
                     <Route path='areas' element={<AreaListPage />} />
                     <Route path='positions' element={<PositionListPage />} />
                     <Route path='epps' element={<EppListPage />} />
+                    <Route path='categories' element={<CategoryListPage />} />
                 </Route>
             </Routes>
         </ProtectedRoute>

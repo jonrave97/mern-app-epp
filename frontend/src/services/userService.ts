@@ -22,6 +22,20 @@ export const getUsers = async (page = 1, limit = 10, search = '') => {
   }
 };
 
+/**
+ * Obtener usuarios con rol de Jefatura
+ * @returns {Promise} Respuesta con usuarios de jefatura
+ */
+export const getJefaturaUsers = async () => {
+  try {
+    const response = await API.get(`/users?rol=Jefatura&limit=100`);
+    return response.data;
+  } catch (error) {
+    console.error('Error al obtener usuarios de jefatura:', error);
+    throw error;
+  }
+};
+
 // Crear un nuevo usuario
 export const createUser = async (userData: { name: string; email: string; password: string; rol?: string }) => {
   try {

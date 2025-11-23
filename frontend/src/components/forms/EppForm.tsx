@@ -1,5 +1,9 @@
+import { useState, useEffect } from 'react';
 import { useForm } from '@hooks/form/useForm';
 import { ModalActions } from '@components/shared/ModalActions';
+import { SearchableSelect } from '@components/shared/SearchableSelect';
+import { getCategories } from '@services/categoryService';
+import type { Category } from '../../types/category';
 
 interface EppFormData {
   code: string;
@@ -16,6 +20,26 @@ interface EppFormProps {
 }
 
 export const EppForm = ({ onSubmit, onCancel, initialData, isEditing = false }: EppFormProps) => {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await getCategories(1, 100);
+        if (response.categories) {
+          setCategories(response.categories.filter((category: Category) => !category.disabled));
+        }
+      } catch (error) {
+        console.error('Error al cargar categorías:', error);
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
   const {
     values,
     errors,
@@ -144,24 +168,21 @@ export const EppForm = ({ onSubmit, onCancel, initialData, isEditing = false }: 
         <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
           Categoría <span className="text-red-500">*</span>
         </label>
-        <input
-          id="category"
-          type="text"
-          name="category"
+        <SearchableSelect
+          options={categories.map(category => ({
+            value: category.name,
+            label: category.name,
+            subtitle: category.description
+          }))}
           value={values.category}
-          onChange={(e) => handleChange('category', e.target.value.toUpperCase())}
+          onChange={(value) => handleChange('category', value)}
           onBlur={() => handleBlur('category')}
-          className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
-            touched.category && errors.category
-              ? 'border-red-500 focus:ring-red-500'
-              : 'border-gray-300 focus:ring-gray-300'
-          }`}
-          placeholder="Ej: CASCO, GUANTES, POLERA"
+          placeholder="Seleccionar categoría"
+          loading={loadingCategories}
         />
         {touched.category && errors.category && (
           <p className="mt-1 text-sm text-red-600">{errors.category}</p>
         )}
-        <p className="mt-1 text-xs text-gray-500">Se convertirá automáticamente a mayúsculas</p>
       </div>
 
       {/* Botones */}

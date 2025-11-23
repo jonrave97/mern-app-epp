@@ -8,6 +8,7 @@ import companyRoutes from './routes/companyRoutes.js';
 import areaRoutes from './routes/areaRoutes.js';
 import positionRoutes from './routes/positionRoutes.js';
 import eppRoutes from './routes/eppRoutes.js';
+import categoryRoutes from './routes/categoryRoutes.js';
 import {connectDB} from './database/db.js';
 
 dotenv.config(); // Cargar variables de entorno
@@ -72,6 +73,7 @@ app.use('/api/companies', companyRoutes);
 app.use('/api/areas', areaRoutes);
 app.use('/api/positions', positionRoutes);
 app.use('/api/epps', eppRoutes);
+app.use('/api/categories', categoryRoutes);
 
 // ========== INICIAR SERVIDOR ==========
 // Primero conectar a la base de datos, luego iniciar el servidor

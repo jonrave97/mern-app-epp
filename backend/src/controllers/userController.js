@@ -12,6 +12,7 @@ export const getAllUsers = async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
     const search = req.query.search || '';
+    const rol = req.query.rol || '';
 
     // Filtro de búsqueda
     const searchFilter = search
@@ -22,6 +23,11 @@ export const getAllUsers = async (req, res) => {
           ]
         }
       : {};
+
+    // Agregar filtro de rol si se proporciona
+    if (rol) {
+      searchFilter.rol = rol;
+    }
 
     const users = await User.find(searchFilter)
       .select('-password -token')
@@ -39,6 +45,7 @@ export const getAllUsers = async (req, res) => {
 
     return res.status(200).json({
       success: true,
+      users: users,
       data: users,
       pagination: {
         currentPage: page,
@@ -63,7 +70,7 @@ export const getAllUsers = async (req, res) => {
 // Crear un nuevo usuario
 export const createUser = async (req, res) => {
   try {
-    const { name, email, password, rol, company, area } = req.body;
+    const { name, email, password, rol, company, area, approverIds } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({ 
@@ -91,6 +98,20 @@ export const createUser = async (req, res) => {
       }
     }
 
+    // Validar que los aprobadores/jefes existan si se proporcionan
+    let bossesList = [];
+    if (approverIds && approverIds.length > 0) {
+      for (const approverId of approverIds) {
+        const approverExists = await User.findById(approverId);
+        if (!approverExists) {
+          return res.status(400).json({ 
+            message: `El jefe/aprobador con ID ${approverId} no existe` 
+          });
+        }
+        bossesList.push({ boss: approverId });
+      }
+    }
+
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ 
@@ -107,7 +128,8 @@ export const createUser = async (req, res) => {
       password: hashedPassword,
       rol: rol || 'usuario',
       company: company || undefined,
-      area: area || undefined
+      area: area || undefined,
+      bosses: bossesList
     });
 
     await newUser.save();
@@ -138,7 +160,7 @@ export const createUser = async (req, res) => {
 export const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, email, password, rol, disabled, company, area } = req.body;
+    const { name, email, password, rol, disabled, company, area, approverIds } = req.body;
 
     const user = await User.findById(id);
     if (!user) {
@@ -163,6 +185,23 @@ export const updateUser = async (req, res) => {
           message: "El área seleccionada no es válida o está inactiva" 
         });
       }
+    }
+
+    // Validar que los aprobadores/jefes existan si se proporcionan
+    if (approverIds !== undefined) {
+      let bossesList = [];
+      if (approverIds && approverIds.length > 0) {
+        for (const approverId of approverIds) {
+          const approverExists = await User.findById(approverId);
+          if (!approverExists) {
+            return res.status(400).json({ 
+              message: `El jefe/aprobador con ID ${approverId} no existe` 
+            });
+          }
+          bossesList.push({ boss: approverId });
+        }
+      }
+      user.bosses = bossesList;
     }
 
     if (email && email !== user.email) {

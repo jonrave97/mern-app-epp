@@ -11,6 +11,8 @@ import { useDropdowns } from "@hooks/ui/useDropdowns";
 export default function Aside({ sidebarOpen }: { sidebarOpen: boolean }) {
   const { openDropdowns, toggleDropdown } = useDropdowns({
     users: false,
+    companies: false,
+    epps: false,
     ecommerce: false,
   });
 
@@ -90,36 +92,82 @@ export default function Aside({ sidebarOpen }: { sidebarOpen: boolean }) {
             </a>
           </li>
 
-          <li className="px-3 hover:bg-gray-200 hover:rounded-base transition border border-transparent hover:border-gray-200">
-            <a
-              href="/admin/companies"
-              className="flex items-center px-2 py-1.5 text-body rounded-base hover:text-fg-brand group"
+          <li className="px-3 mb-0">
+            <button
+              type="button"
+              onClick={() => toggleDropdown('companies')}
+              className="flex items-center w-full justify-between px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group"
+              aria-expanded={openDropdowns.companies}
             >
               <CompanyIcon className="shrink-0 w-5 h-5 transition duration-75 group-hover:text-fg-brand" />
-              <span className="flex-1 ms-3 whitespace-nowrap">Empresas</span>
-            </a>
+              <span className="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">
+                Empresas
+              </span>
+              <ChevronDownIcon
+                className={`w-5 h-5 transition-transform ${
+                  openDropdowns.companies ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+            <ul className={`transition-all duration-700 ease-in-out overflow-hidden ${
+              openDropdowns.companies ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+            } py-2 space-y-2`}>
+              <li>
+                <a
+                  href="/admin/companies"
+                  className="pl-10 flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group"
+                >
+                  Lista de Empresas
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/admin/areas"
+                  className="pl-10 flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group"
+                >
+                  Áreas
+                </a>
+              </li>
+            </ul>
           </li>
 
-          <li className="px-3 hover:bg-gray-200 hover:rounded-base transition border border-transparent hover:border-gray-200">
-            <a
-              href="/admin/areas"
-              className="flex items-center px-2 py-1.5 text-body rounded-base hover:text-fg-brand group"
-            >
-              <svg className="shrink-0 w-5 h-5 transition duration-75 group-hover:text-fg-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-              </svg>
-              <span className="flex-1 ms-3 whitespace-nowrap">Áreas</span>
-            </a>
-          </li>
-
-          <li className="px-3 hover:bg-gray-200 hover:rounded-base transition border border-transparent hover:border-gray-200">
-            <a
-              href="/admin/epps"
-              className="flex items-center px-2 py-1.5 text-body rounded-base hover:text-fg-brand group"
+          <li className="px-3 mb-0">
+            <button
+              type="button"
+              onClick={() => toggleDropdown('epps')}
+              className="flex items-center w-full justify-between px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group"
+              aria-expanded={openDropdowns.epps}
             >
               <EppsIcon className="shrink-0 w-5 h-5 transition duration-75 group-hover:text-fg-brand" />
-              <span className="flex-1 ms-3 whitespace-nowrap">EPPs</span>
-            </a>
+              <span className="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">
+                EPPs
+              </span>
+              <ChevronDownIcon
+                className={`w-5 h-5 transition-transform ${
+                  openDropdowns.epps ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+            <ul className={`transition-all duration-700 ease-in-out overflow-hidden ${
+              openDropdowns.epps ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+            } py-2 space-y-2`}>
+              <li>
+                <a
+                  href="/admin/epps"
+                  className="pl-10 flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group"
+                >
+                  Lista de EPPs
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/admin/categories"
+                  className="pl-10 flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group"
+                >
+                  Categorías
+                </a>
+              </li>
+            </ul>
           </li>
 
           <li className="px-3">

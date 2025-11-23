@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { useForm } from '@hooks/form/useForm';
 import { ModalActions } from '@components/shared/ModalActions';
 import { SearchableSelect } from '@components/shared/SearchableSelect';
+import { MultiSearchableSelect } from '@components/shared/MultiSearchableSelect';
 import { getCompanies } from '@services/companyService';
 import { getAreas } from '@services/areaService';
+import { getJefaturaUsers } from '@services/userService';
 
 interface Company {
   _id: string;
@@ -19,8 +21,15 @@ interface Area {
   disabled?: boolean;
 }
 
+interface JefaturaUser {
+  _id: string;
+  name: string;
+  email: string;
+  rol: string;
+}
+
 interface UserFormProps {
-  onSubmit: (data: { name: string; email: string; password?: string; rol?: string; company?: string; area?: string; costCenter?: string }) => Promise<void>;
+  onSubmit: (data: { name: string; email: string; password?: string; rol?: string; company?: string; area?: string; costCenter?: string; approverIds?: string[] }) => Promise<void>;
   onCancel: () => void;
   initialData?: {
     name: string;
@@ -29,6 +38,7 @@ interface UserFormProps {
     company?: string;
     area?: string;
     costCenter?: string;
+    approverIds?: string[];
   };
   isEditing?: boolean;
 }
@@ -38,6 +48,8 @@ export function UserForm({ onSubmit, onCancel, initialData, isEditing = false }:
   const [loadingCompanies, setLoadingCompanies] = useState(true);
   const [areas, setAreas] = useState<Area[]>([]);
   const [loadingAreas, setLoadingAreas] = useState(true);
+  const [jefaturaUsers, setJefaturaUsers] = useState<JefaturaUser[]>([]);
+  const [loadingJefatura, setLoadingJefatura] = useState(true);
 
   useEffect(() => {
     const fetchCompanies = async () => {
@@ -66,8 +78,22 @@ export function UserForm({ onSubmit, onCancel, initialData, isEditing = false }:
       }
     };
 
+    const fetchJefaturaUsers = async () => {
+      try {
+        const response = await getJefaturaUsers();
+        if (response.users) {
+          setJefaturaUsers(response.users);
+        }
+      } catch (error) {
+        console.error('Error al cargar usuarios de jefatura:', error);
+      } finally {
+        setLoadingJefatura(false);
+      }
+    };
+
     fetchCompanies();
     fetchAreas();
+    fetchJefaturaUsers();
   }, []);
 
   const {
@@ -87,6 +113,7 @@ export function UserForm({ onSubmit, onCancel, initialData, isEditing = false }:
       company: initialData?.company || '',
       area: initialData?.area || '',
       costCenter: initialData?.costCenter || '',
+      approverIds: initialData?.approverIds || [],
     },
     validationRules: {
       name: {
@@ -108,13 +135,14 @@ export function UserForm({ onSubmit, onCancel, initialData, isEditing = false }:
           },
     },
     onSubmit: async (data) => {
-      const submitData: { name: string; email: string; password?: string; rol?: string; company?: string; area?: string; costCenter?: string } = {
+      const submitData: { name: string; email: string; password?: string; rol?: string; company?: string; area?: string; costCenter?: string; approverIds?: string[] } = {
         name: data.name,
         email: data.email,
         rol: data.rol,
         company: data.company,
         area: data.area,
         costCenter: data.costCenter,
+        approverIds: data.approverIds && data.approverIds.length > 0 ? data.approverIds : undefined,
       };
       // Solo incluir contraseña si se proporcionó
       if (data.password) {
@@ -231,6 +259,26 @@ export function UserForm({ onSubmit, onCancel, initialData, isEditing = false }:
           placeholder="Se asigna automáticamente al seleccionar área"
         />
         <p className="mt-1 text-xs text-gray-500">Se asigna automáticamente al seleccionar un área</p>
+      </div>
+
+      {/* Jefatura/Aprobadores (múltiples) */}
+      <div>
+        <label htmlFor="approverIds" className="block text-sm font-medium text-gray-700 mb-1">
+          Jefatura/Aprobadores
+        </label>
+        <MultiSearchableSelect
+          options={jefaturaUsers.map(user => ({
+            value: user._id,
+            label: user.name,
+            subtitle: user.email
+          }))}
+          value={values.approverIds as string[]}
+          onChange={(values) => handleChange('approverIds', values)}
+          onBlur={() => handleBlur('approverIds')}
+          placeholder="Seleccionar jefaturas (puede seleccionar múltiples)"
+          loading={loadingJefatura}
+        />
+        <p className="mt-1 text-xs text-gray-500">Selecciona uno o más usuarios con rol de jefatura que aprobarán a este usuario</p>
       </div>
 
       {/* Contraseña */}
