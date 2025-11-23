@@ -48,7 +48,7 @@ export const createUser = async (userData: { name: string; email: string; passwo
 };
 
 // Actualizar un usuario
-export const updateUser = async (id: string, userData: Partial<{ name: string; email: string; rol: string; disabled: boolean }>) => {
+export const updateUser = async (id: string, userData: Partial<{ name: string; email: string; rol: string; disabled: boolean; company?: string; area?: string; costCenter?: string; password?: string; bosses?: string[] }>) => {
   try {
     const response = await API.put(`/users/${id}`, userData);
     return response.data;

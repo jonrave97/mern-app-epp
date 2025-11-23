@@ -21,7 +21,7 @@ function UserListPage() {
   const bossesModal = useModal<User>();
   const { actionError, successMessage, clearMessages, handleError, handleSuccess } = useCrudActions();
   const [actionLoading, setActionLoading] = useState(false);
-  const [jefaturaUsers, setJefaturaUsers] = useState<any[]>([]);
+  const [jefaturaUsers, setJefaturaUsers] = useState<User[]>([]);
   const [loadingJefatura, setLoadingJefatura] = useState(false);
   const [selectedBosses, setSelectedBosses] = useState<string[]>([]);
 
@@ -29,6 +29,7 @@ function UserListPage() {
   useEffect(() => {
     refresh();
     loadJefaturaUsers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Cargar jefatura users
@@ -37,7 +38,7 @@ function UserListPage() {
       setLoadingJefatura(true);
       const response = await getJefaturaUsers();
       if (response.users) {
-        setJefaturaUsers(response.users.filter((user: any) => !user.disabled));
+        setJefaturaUsers(response.users.filter((user: User) => !user.disabled));
       }
     } catch (error) {
       console.error('Error al cargar jefatura users:', error);
@@ -48,8 +49,21 @@ function UserListPage() {
 
   // Actualizar selectedBosses cuando se abre el modal
   useEffect(() => {
-    if (bossesModal.isOpen && bossesModal.selectedItem?.bosses) {
-      setSelectedBosses(bossesModal.selectedItem.bosses);
+    if (bossesModal.isOpen && bossesModal.selectedItem) {
+      // Extraer los IDs de los bosses del usuario
+      const bossesIds = bossesModal.selectedItem.bosses?.map(b => {
+        // boss puede ser un string (ID) o un objeto con _id y name
+        if (typeof b.boss === 'string') {
+          return b.boss;
+        } else if (b.boss && typeof b.boss === 'object' && '_id' in b.boss) {
+          return b.boss._id;
+        }
+        return '';
+      }).filter(Boolean) || [];
+      setSelectedBosses(bossesIds);
+    } else {
+      // Limpiar cuando se cierra el modal
+      setSelectedBosses([]);
     }
   }, [bossesModal.isOpen, bossesModal.selectedItem]);
 
@@ -246,7 +260,7 @@ function UserListPage() {
                 </td>
               </tr>
             ) : (
-              users.map((user: User) => (
+              users.map((user) => (
                 <tr
                   key={user._id}
                   className="border-b border-gray-200 hover:bg-gray-50 transition duration-150"

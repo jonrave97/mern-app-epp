@@ -176,7 +176,7 @@ export const createUser = async (req, res) => {
 export const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, email, password, rol, disabled, company, area, approverIds } = req.body;
+    const { name, email, password, rol, disabled, company, area, approverIds, bosses } = req.body;
 
     const user = await User.findById(id);
     if (!user) {
@@ -203,11 +203,12 @@ export const updateUser = async (req, res) => {
       }
     }
 
-    // Validar que los aprobadores/jefes existan si se proporcionan
-    if (approverIds !== undefined) {
+    // Validar que los aprobadores/jefes existan si se proporcionan (soporta bosses y approverIds)
+    const bossesInput = bosses || approverIds;
+    if (bossesInput !== undefined) {
       let bossesList = [];
-      if (approverIds && approverIds.length > 0) {
-        for (const approverId of approverIds) {
+      if (bossesInput && bossesInput.length > 0) {
+        for (const approverId of bossesInput) {
           const approverExists = await User.findById(approverId);
           if (!approverExists) {
             return res.status(400).json({ 

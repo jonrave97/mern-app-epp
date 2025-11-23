@@ -11,7 +11,10 @@ interface User {
   company?: string;
   area?: string;
   costCenter?: string;
-  bosses?: string[];
+  bosses?: Array<{
+    _id?: string;
+    boss?: string | { _id: string; name: string; email: string };
+  }>;
   disabled: boolean;
   __v: number;
 }
