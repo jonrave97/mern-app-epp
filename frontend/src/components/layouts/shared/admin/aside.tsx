@@ -63,14 +63,6 @@ export default function Aside({ sidebarOpen }: { sidebarOpen: boolean }) {
               </li>
               <li>
                 <a
-                  href="/admin/users/create"
-                  className="pl-10 flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group transition-all duration-200 active:scale-95 active:bg-neutral-secondary-medium cursor-pointer transform hover:scale-[1.02]"
-                >
-                  Crear Usuario
-                </a>
-              </li>
-              <li>
-                <a
                   href="/admin/permissions"
                   className="pl-10 flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group transition-all duration-200 active:scale-95 active:bg-neutral-secondary-medium cursor-pointer transform hover:scale-[1.02]"
                 >
