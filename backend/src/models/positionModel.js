@@ -1,13 +1,7 @@
 import mongoose from 'mongoose';
 
-const areaSchema = new mongoose.Schema({
+const positionSchema = new mongoose.Schema({
     name: {
-        type: String,
-        required: true,
-        unique: true,
-        trim: true
-    },
-    costCenter: {
         type: String,
         required: true,
         unique: true,
@@ -16,11 +10,15 @@ const areaSchema = new mongoose.Schema({
     disabled: {
         type: Boolean,
         default: false
-    }
+    },
+    epps: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Epp'
+    }]
 }, {
     timestamps: true // Agrega createdAt y updatedAt automáticamente
 });
 
-const Area = mongoose.model('Area', areaSchema);
+const Position = mongoose.model('Position', positionSchema);
 
-export default Area;
+export default Position;

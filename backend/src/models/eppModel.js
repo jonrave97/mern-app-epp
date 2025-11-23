@@ -23,6 +23,13 @@ const eppSchema = new mongoose.Schema({
     max: [999999.99, 'El precio no puede exceder 999999.99'],
     trim: true
   },
+  category: {
+    type: String,
+    required: [true, 'La categoría del EPP es obligatoria'],
+    trim: true,
+    uppercase: true,
+    maxlength: [50, 'La categoría no puede exceder 50 caracteres']
+  },
   disabled: {
     type: Boolean,
     default: false

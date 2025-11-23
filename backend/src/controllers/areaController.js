@@ -56,6 +56,12 @@ export const createArea = async (req, res) => {
             return res.status(400).json({ message: 'Ya existe un área con ese nombre' });
         }
 
+        // Verificar si ya existe un área con ese centro de costo
+        const existingCostCenter = await Area.findOne({ costCenter: costCenter.toUpperCase() });
+        if (existingCostCenter) {
+            return res.status(400).json({ message: 'Ya existe un área con ese centro de costo' });
+        }
+
         const area = new Area({
             name,
             costCenter: costCenter.toUpperCase(),
@@ -89,6 +95,14 @@ export const updateArea = async (req, res) => {
             const existingArea = await Area.findOne({ name });
             if (existingArea) {
                 return res.status(400).json({ message: 'Ya existe un área con ese nombre' });
+            }
+        }
+
+        // Verificar costCenter único si se está cambiando
+        if (costCenter && costCenter.toUpperCase() !== area.costCenter) {
+            const existingCostCenter = await Area.findOne({ costCenter: costCenter.toUpperCase() });
+            if (existingCostCenter) {
+                return res.status(400).json({ message: 'Ya existe un área con ese centro de costo' });
             }
         }
 

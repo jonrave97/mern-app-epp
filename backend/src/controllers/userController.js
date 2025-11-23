@@ -11,16 +11,31 @@ export const getAllUsers = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
+    const search = req.query.search || '';
 
-    const users = await User.find()
+    // Filtro de búsqueda
+    const searchFilter = search
+      ? {
+          $or: [
+            { name: { $regex: search, $options: 'i' } },
+            { email: { $regex: search, $options: 'i' } }
+          ]
+        }
+      : {};
+
+    const users = await User.find(searchFilter)
       .select('-password -token')
       .skip(skip)
       .limit(limit);
 
-    const totalUsers = await User.countDocuments();
-    const activeUsers = await User.countDocuments({ disabled: { $ne: true } });
-    const inactiveUsers = await User.countDocuments({ disabled: true });
-    const totalPages = Math.ceil(totalUsers / limit);
+    // Total filtrado (para paginación)
+    const totalFiltered = await User.countDocuments(searchFilter);
+    const totalPages = Math.ceil(totalFiltered / limit);
+
+    // Estadísticas generales (sin filtro de búsqueda)
+    const totalGeneral = await User.countDocuments();
+    const activeGeneral = await User.countDocuments({ disabled: { $ne: true } });
+    const inactiveGeneral = await User.countDocuments({ disabled: true });
 
     return res.status(200).json({
       success: true,
@@ -28,15 +43,15 @@ export const getAllUsers = async (req, res) => {
       pagination: {
         currentPage: page,
         totalPages: totalPages,
-        totalItems: totalUsers,
+        totalItems: totalFiltered,
         itemsPerPage: limit,
         hasNextPage: page < totalPages,
         hasPrevPage: page > 1
       },
       stats: {
-        total: totalUsers,
-        active: activeUsers,
-        inactive: inactiveUsers
+        total: totalGeneral,
+        active: activeGeneral,
+        inactive: inactiveGeneral
       }
     });
   } catch (error) {

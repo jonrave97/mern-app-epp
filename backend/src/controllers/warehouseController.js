@@ -6,21 +6,31 @@ export const getAllWarehouses = async (req, res) => {
     const page = parseInt(req.query.page) || 1; // Página actual (default: 1)
     const limit = parseInt(req.query.limit) || 10; // Elementos por página (default: 10)
     const skip = (page - 1) * limit; // Calcular cuántos documentos saltar
+    const search = req.query.search || '';
 
-    // Obtener warehouses con paginación
-    const warehouses = await warehosemodels.find()
+    // Filtro de búsqueda
+    const searchFilter = search
+      ? {
+          $or: [
+            { name: { $regex: search, $options: 'i' } },
+            { code: { $regex: search, $options: 'i' } }
+          ]
+        }
+      : {};
+
+    // Obtener warehouses con paginación y filtro
+    const warehouses = await warehosemodels.find(searchFilter)
       .skip(skip)
       .limit(limit);
 
-    // Contar el total de documentos
-    const totalWarehouses = await warehosemodels.countDocuments();
-    
-    // Contar bodegas activas e inactivas
-    const activeWarehouses = await warehosemodels.countDocuments({ disabled: { $ne: true } });
-    const inactiveWarehouses = await warehosemodels.countDocuments({ disabled: true });
+    // Total filtrado (para paginación)
+    const totalFiltered = await warehosemodels.countDocuments(searchFilter);
+    const totalPages = Math.ceil(totalFiltered / limit);
 
-    // Calcular total de páginas
-    const totalPages = Math.ceil(totalWarehouses / limit);
+    // Estadísticas generales (sin filtro de búsqueda)
+    const totalGeneral = await warehosemodels.countDocuments();
+    const activeGeneral = await warehosemodels.countDocuments({ disabled: { $ne: true } });
+    const inactiveGeneral = await warehosemodels.countDocuments({ disabled: true });
 
     // Retornar respuesta con datos de paginación
     return res.status(200).json({
@@ -28,15 +38,15 @@ export const getAllWarehouses = async (req, res) => {
       pagination: {
         currentPage: page,
         totalPages: totalPages,
-        totalItems: totalWarehouses,
+        totalItems: totalFiltered,
         itemsPerPage: limit,
         hasNextPage: page < totalPages,
         hasPrevPage: page > 1
       },
       stats: {
-        total: totalWarehouses,
-        active: activeWarehouses,
-        inactive: inactiveWarehouses
+        total: totalGeneral,
+        active: activeGeneral,
+        inactive: inactiveGeneral
       }
     });
   } catch (error) {
