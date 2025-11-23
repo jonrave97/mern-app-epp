@@ -2,7 +2,174 @@ import User from "../models/userModel.js";
 import bcrypt from "bcrypt";
 import jsonwebtoken from "jsonwebtoken";
 import { getUserbyEmailWithPassword } from "../services/userServices.js";
-// import { generateToken } from "../libs/tokenGenerator.js";
+
+// Obtener todos los usuarios con paginación
+export const getAllUsers = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const users = await User.find()
+      .select('-password -token')
+      .skip(skip)
+      .limit(limit);
+
+    const totalUsers = await User.countDocuments();
+    const activeUsers = await User.countDocuments({ disabled: { $ne: true } });
+    const inactiveUsers = await User.countDocuments({ disabled: true });
+    const totalPages = Math.ceil(totalUsers / limit);
+
+    return res.status(200).json({
+      success: true,
+      data: users,
+      pagination: {
+        currentPage: page,
+        totalPages: totalPages,
+        totalItems: totalUsers,
+        itemsPerPage: limit,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1
+      },
+      stats: {
+        total: totalUsers,
+        active: activeUsers,
+        inactive: inactiveUsers
+      }
+    });
+  } catch (error) {
+    console.error("❌ Error al obtener usuarios:", error.message);
+    return res.status(500).json({ success: false, message: "Error al obtener usuarios" });
+  }
+};
+
+// Crear un nuevo usuario
+export const createUser = async (req, res) => {
+  try {
+    const { name, email, password, rol } = req.body;
+
+    if (!name || !email || !password) {
+      return res.status(400).json({ 
+        message: "Nombre, email y contraseña son obligatorios" 
+      });
+    }
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ 
+        message: "Ya existe un usuario con ese email" 
+      });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const newUser = new User({
+      name: name.trim(),
+      email: email.trim().toLowerCase(),
+      password: hashedPassword,
+      rol: rol || 'usuario'
+    });
+
+    await newUser.save();
+
+    const userResponse = newUser.toObject();
+    delete userResponse.password;
+    delete userResponse.token;
+
+    console.log("✅ Usuario creado:", userResponse);
+    return res.status(201).json({
+      message: "Usuario creado exitosamente",
+      data: userResponse
+    });
+  } catch (error) {
+    console.error("❌ Error al crear usuario:", error.message);
+    
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ 
+        message: Object.values(error.errors).map(e => e.message).join(', ')
+      });
+    }
+
+    return res.status(500).json({ message: "Error al crear usuario" });
+  }
+};
+
+// Actualizar un usuario
+export const updateUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, email, password, rol, disabled } = req.body;
+
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    if (email && email !== user.email) {
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        return res.status(400).json({ 
+          message: "Ya existe un usuario con ese email" 
+        });
+      }
+    }
+
+    if (name) user.name = name.trim();
+    if (email) user.email = email.trim().toLowerCase();
+    if (rol) user.rol = rol;
+    if (disabled !== undefined) user.disabled = disabled;
+    
+    if (password) {
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(password, salt);
+    }
+
+    await user.save();
+
+    const userResponse = user.toObject();
+    delete userResponse.password;
+    delete userResponse.token;
+
+    console.log("✅ Usuario actualizado:", userResponse);
+    return res.status(200).json({
+      message: "Usuario actualizado exitosamente",
+      data: userResponse
+    });
+  } catch (error) {
+    console.error("❌ Error al actualizar usuario:", error.message);
+    
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ 
+        message: Object.values(error.errors).map(e => e.message).join(', ')
+      });
+    }
+
+    return res.status(500).json({ message: "Error al actualizar usuario" });
+  }
+};
+
+// Eliminar un usuario
+export const deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const user = await User.findByIdAndDelete(id);
+    
+    if (!user) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    console.log("✅ Usuario eliminado:", user.email);
+    return res.status(200).json({
+      message: "Usuario eliminado exitosamente",
+      data: { id: user._id, email: user.email }
+    });
+  } catch (error) {
+    console.error("❌ Error al eliminar usuario:", error.message);
+    return res.status(500).json({ message: "Error al eliminar usuario" });
+  }
+};
 
 export const registerUser = async (req, res) => {
   // Extraer datos del cuerpo de la solicitud

@@ -30,13 +30,59 @@ const userSchema = new mongoose.Schema({
     },
     rol: {
         type: String,
-        enum: ['admin', 'user', 'warehouse_manager'],
-        default: 'user'
+        enum: ['admin', 'usuario', 'supervisor', 'warehouse_manager', 'Jefatura'],
+        default: 'usuario'
+    },
+    disabled: {
+        type: Boolean,
+        default: false
+    },
+    company: {
+        type: String,
+        trim: true
+    },
+    area: {
+        type: String,
+        trim: true
+    },
+    costCenter: {
+        type: String,
+        trim: true
+    },
+    rut: {
+        type: Number
+    },
+    sizes: {
+        footwear: {
+            type: String,
+            trim: true
+        },
+        gloves: {
+            type: String,
+            enum: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
+            trim: true
+        },
+        pants: {
+            letter: {
+                type: String,
+                enum: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
+                trim: true
+            },
+            number: {
+                type: String,
+                trim: true
+            }
+        },
+        shirtJacket: {
+            type: String,
+            enum: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
+            trim: true
+        }
     },
     token:{
         type: String,
         trim: true,
-        default: () => generateToken()
+        default: null
     },
     confirmed: {
         type: Boolean,
