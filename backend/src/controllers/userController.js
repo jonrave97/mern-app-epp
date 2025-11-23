@@ -1,4 +1,5 @@
 import User from "../models/userModel.js";
+import Company from "../models/companyModel.js";
 import bcrypt from "bcrypt";
 import jsonwebtoken from "jsonwebtoken";
 import { getUserbyEmailWithPassword } from "../services/userServices.js";
@@ -46,12 +47,22 @@ export const getAllUsers = async (req, res) => {
 // Crear un nuevo usuario
 export const createUser = async (req, res) => {
   try {
-    const { name, email, password, rol } = req.body;
+    const { name, email, password, rol, company } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({ 
         message: "Nombre, email y contraseña son obligatorios" 
       });
+    }
+
+    // Validar que la empresa exista si se proporciona
+    if (company) {
+      const companyExists = await Company.findOne({ name: company, disabled: { $ne: true } });
+      if (!companyExists) {
+        return res.status(400).json({ 
+          message: "La empresa seleccionada no es válida o está inactiva" 
+        });
+      }
     }
 
     const existingUser = await User.findOne({ email });
@@ -68,7 +79,8 @@ export const createUser = async (req, res) => {
       name: name.trim(),
       email: email.trim().toLowerCase(),
       password: hashedPassword,
-      rol: rol || 'usuario'
+      rol: rol || 'usuario',
+      company: company || undefined
     });
 
     await newUser.save();
@@ -99,11 +111,21 @@ export const createUser = async (req, res) => {
 export const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, email, password, rol, disabled } = req.body;
+    const { name, email, password, rol, disabled, company } = req.body;
 
     const user = await User.findById(id);
     if (!user) {
       return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    // Validar que la empresa exista si se proporciona
+    if (company) {
+      const companyExists = await Company.findOne({ name: company, disabled: { $ne: true } });
+      if (!companyExists) {
+        return res.status(400).json({ 
+          message: "La empresa seleccionada no es válida o está inactiva" 
+        });
+      }
     }
 
     if (email && email !== user.email) {
@@ -119,6 +141,7 @@ export const updateUser = async (req, res) => {
     if (email) user.email = email.trim().toLowerCase();
     if (rol) user.rol = rol;
     if (disabled !== undefined) user.disabled = disabled;
+    if (company !== undefined) user.company = company || undefined;
     
     if (password) {
       const salt = await bcrypt.genSalt(10);

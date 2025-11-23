@@ -2,8 +2,7 @@ import { Router } from "express";
 import {
   getAllWarehouses,
   createWarehouse,
-  updateWarehouse,
-  deleteWarehouse
+  updateWarehouse
 } from "../controllers/warehouseController.js";
 
 const warehouseRoutes = Router();
@@ -11,6 +10,5 @@ const warehouseRoutes = Router();
 warehouseRoutes.get('/all', getAllWarehouses);
 warehouseRoutes.post('/create', createWarehouse);
 warehouseRoutes.put('/update/:id', updateWarehouse);
-warehouseRoutes.delete('/delete/:id', deleteWarehouse);
 
 export default warehouseRoutes;

@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 import morgan from 'morgan';
 import userRoutes from './routes/userRoutes.js';
 import warehouseRoutes from './routes/warehouseRoutes.js';
+import companyRoutes from './routes/companyRoutes.js';
+import areaRoutes from './routes/areaRoutes.js';
 import {connectDB} from './database/db.js';
 
 dotenv.config(); // Cargar variables de entorno
@@ -64,6 +66,8 @@ app.use(cors({
 // ========== RUTAS ==========
 app.use('/api/users', userRoutes);
 app.use('/api/warehouses', warehouseRoutes);
+app.use('/api/companies', companyRoutes);
+app.use('/api/areas', areaRoutes);
 
 // ========== INICIAR SERVIDOR ==========
 // Primero conectar a la base de datos, luego iniciar el servidor
