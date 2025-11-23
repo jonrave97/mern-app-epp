@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { createContext, useState, useEffect } from "react";
-import API from "../services/api";
+import API from "@services/api";
 
 // Definición de la interfaz User utilizada en el contexto de autenticación
 export interface User {

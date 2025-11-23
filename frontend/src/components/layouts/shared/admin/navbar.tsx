@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useAuth } from '../../../../hooks/auth/useAuthContext';
+import { useAuth } from '@hooks/auth/useAuthContext';
 
 
 export default function Navbar({ sidebarOpen, setSidebarOpen }: { sidebarOpen: boolean; setSidebarOpen: (open: boolean) => void }) {

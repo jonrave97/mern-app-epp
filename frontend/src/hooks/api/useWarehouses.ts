@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { getWarehouses } from '../../services/warehouseService';
+import { getWarehouses } from '@services/warehouseService';
 
 interface Warehouse {
   _id: string;

@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { useWarehouses } from '../../../hooks/api/useWarehouses';
-import { createWarehouse, updateWarehouse } from '../../../services/warehouseService';
-import { Modal } from '../../../components/shared/Modal';
-import { ModalActions } from '../../../components/shared/ModalActions';
-import { Pagination } from '../../../components/shared/Pagination';
-import { WarehouseForm } from '../../../components/forms/WarehouseForm';
-import { EditIcon, LockIcon } from '../../../components/icons';
+import { useWarehouses } from '@hooks/api/useWarehouses';
+import { createWarehouse, updateWarehouse } from '@services/warehouseService';
+import { Modal } from '@components/shared/Modal';
+import { ModalActions } from '@components/shared/ModalActions';
+import { Pagination } from '@components/shared/Pagination';
+import { WarehouseForm } from '@components/forms/WarehouseForm';
+import { EditIcon, LockIcon } from '@components/icons';
 import type { Warehouses } from '../../../types/warehouses';
 
 function WarehouseListPage() {

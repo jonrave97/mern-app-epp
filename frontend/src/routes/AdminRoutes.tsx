@@ -1,6 +1,6 @@
 import {Routes, Route} from 'react-router-dom';
 import { ProtectedRoute } from './ProtectedRoute';
-import AdminLayout from '../components/layouts/AdminLayout.tsx';
+import AdminLayout from '@components/layouts/AdminLayout.tsx';
 import UserCreatePage from '../pages/admin/users/UserCreatePage.tsx';
 import UserListPage from '../pages/admin/users/UserListPage.tsx';
 import AdminDashboardPage  from '../pages/admin/AdminDashboardPage.tsx';
