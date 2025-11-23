@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import permissionService, { UserWithPermissions, PermissionStructure, UserPermissions } from '../../services/permissionService';
+import permissionService, { type UserWithPermissions, type PermissionStructure, type UserPermissions } from '../../services/permissionService';
 
 interface UsePermissionPanelResult {
   users: UserWithPermissions[];

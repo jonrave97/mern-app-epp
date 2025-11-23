@@ -1,4 +1,4 @@
-import { useAuthContext } from './useAuthContext';
+import { useAuth } from './useAuthContext';
 
 // Permisos del frontend (deben coincidir con backend)
 const ROLE_PERMISSIONS = {
@@ -29,7 +29,7 @@ const ROLE_PERMISSIONS = {
 };
 
 export const usePermissions = () => {
-  const { user } = useAuthContext();
+  const { auth: user } = useAuth();
   
   const hasPermission = (resource: string, action: string): boolean => {
     if (!user || !user.rol) return false;

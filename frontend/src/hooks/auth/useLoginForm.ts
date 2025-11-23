@@ -10,6 +10,9 @@ export const useLogin = () => {
   const [loading, setLoading] = useState<boolean>(false); // Estado para indicar si la solicitud de login está en proceso
   const [error, setError] = useState<string | null>(null); // Estado para almacenar errores de login
   const [success, setSuccess] = useState<boolean>(false); // Estado para indicar si el login fue exitoso
+  const [isBlocked, setIsBlocked] = useState<boolean>(false); // Estado para indicar si la cuenta está bloqueada
+  const [remainingTime, setRemainingTime] = useState<number>(0); // Tiempo restante de bloqueo en segundos
+  const [attemptsRemaining, setAttemptsRemaining] = useState<number | null>(null); // Intentos restantes
   const navigate = useNavigate(); // Hook de React Router para navegación programática
   const { setAuth } = useAuth(); // Usar el contexto de autenticación
 
@@ -55,9 +58,28 @@ export const useLogin = () => {
       // Redirigir al dashboard del admin
       navigate('/admin/dashboard');
 
-    } catch (err) {
+    } catch (err: any) {
         // Manejo de errores
       const errorMessage = err instanceof Error ? err.message : 'Error al iniciar sesión';
+      
+      // Manejar diferentes tipos de error
+      if (err.status === 429) {
+        // Cuenta bloqueada
+        setIsBlocked(true);
+        setRemainingTime(err.remainingTime || 0);
+        setAttemptsRemaining(null);
+      } else if (err.status === 401) {
+        // Credenciales incorrectas
+        setIsBlocked(false);
+        setRemainingTime(0);
+        setAttemptsRemaining(err.attemptsRemaining || null);
+      } else {
+        // Error genérico
+        setIsBlocked(false);
+        setRemainingTime(0);
+        setAttemptsRemaining(null);
+      }
+      
       // Actualizar estado de error
       setError(errorMessage);
       console.error('❌ Error:', errorMessage);
@@ -76,6 +98,9 @@ export const useLogin = () => {
     loading,
     error,
     success,
+    isBlocked,
+    remainingTime,
+    attemptsRemaining,
     handleLogin,
   };
 };

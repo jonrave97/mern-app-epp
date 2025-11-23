@@ -1,6 +1,7 @@
 import User from "../models/userModel.js";
 import Company from "../models/companyModel.js";
 import Area from "../models/areaModel.js";
+import LoginAttempt from "../models/loginAttemptModel.js";
 import bcrypt from "bcrypt";
 import jsonwebtoken from "jsonwebtoken";
 import { getUserbyEmailWithPassword } from "../services/userServices.js";
@@ -333,10 +334,40 @@ export const loginUser = async (req, res) => {
         .json({ message: "El email y la contraseña son obligatorios" });
     }
 
+    // Verificar si puede intentar login
+    const loginCheck = await LoginAttempt.canAttemptLogin(email);
+    
+    if (!loginCheck.allowed) {
+      const minutes = Math.ceil(loginCheck.remainingTime / 60);
+      const seconds = loginCheck.remainingTime % 60;
+      const timeText = minutes > 0 
+        ? `${minutes} minuto${minutes > 1 ? 's' : ''}` 
+        : `${seconds} segundo${seconds !== 1 ? 's' : ''}`;
+      
+      return res.status(429).json({ 
+        message: `Cuenta temporalmente bloqueada. Demasiados intentos fallidos. Intenta nuevamente en ${timeText}.`,
+        isBlocked: true,
+        remainingTime: loginCheck.remainingTime,
+        attempts: loginCheck.attempts
+      });
+    }
+
     //Buscar el usuario por email (CON contraseña para validar)
     const userFound = await getUserbyEmailWithPassword(email);
     if (!userFound) {
-      return res.status(401).json({ message: "Email o contraseña incorrectos" });
+      // Incrementar intentos fallidos
+      await LoginAttempt.incFailedAttempt(email);
+      return res.status(401).json({ 
+        message: "Email o contraseña incorrectos",
+        attemptsRemaining: Math.max(0, 3 - (loginCheck.attempts || 0) - 1)
+      });
+    }
+
+    // Verificar si el usuario está deshabilitado
+    if (userFound.disabled) {
+      return res.status(401).json({ 
+        message: "Cuenta desactivada. Contacta al administrador." 
+      });
     }
 
     // Verificar la contraseña y compara con la almacenada
@@ -344,8 +375,26 @@ export const loginUser = async (req, res) => {
     const isMatch = await bcrypt.compare(password, userFound.password);
     if (!isMatch) {
       console.log("❌ Contraseña incorrecta para el usuario:", email);
-      return res.status(401).json({ message: "Credenciales incorrectas" });
+      
+      // Incrementar intentos fallidos
+      const attempt = await LoginAttempt.incFailedAttempt(email);
+      const attemptsRemaining = Math.max(0, 3 - attempt.attempts);
+      
+      let message = "Credenciales incorrectas";
+      if (attemptsRemaining > 0) {
+        message += `. Te quedan ${attemptsRemaining} intento${attemptsRemaining !== 1 ? 's' : ''}`;
+      } else {
+        message = "Demasiados intentos fallidos. Cuenta bloqueada por 1 minuto.";
+      }
+      
+      return res.status(401).json({ 
+        message,
+        attemptsRemaining
+      });
     }
+
+    // Login exitoso - limpiar intentos fallidos
+    await LoginAttempt.resetAttempts(email);
 
     const token = jsonwebtoken.sign(
       { id: userFound._id,
@@ -358,7 +407,7 @@ export const loginUser = async (req, res) => {
     console.log("✅ Login exitoso para:", email);
     console.log(userFound);
     return res.status(200).json({ 
-      message: "Login exitoso1", 
+      message: "Login exitoso", 
       id: userFound._id, 
       name: userFound.name,
       email: userFound.email,

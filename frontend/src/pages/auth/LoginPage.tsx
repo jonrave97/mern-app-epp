@@ -6,7 +6,13 @@ function LoginPage() {
     usePageTitle("Login");
 
     // Usamos el hook personalizado para manejar el login
-    const { email, setEmail, password, setPassword, loading, error, success, handleLogin } = useLogin();
+    const { 
+        email, setEmail, 
+        password, setPassword, 
+        loading, error, success, 
+        isBlocked, remainingTime, attemptsRemaining,
+        handleLogin 
+    } = useLogin();
     return (
         <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
             <div className="max-w-md w-full">
@@ -28,8 +34,31 @@ function LoginPage() {
 
                     <form className="space-y-6" onSubmit={handleLogin}>
                         {error && (
-                            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg">
-                                {error}
+                            <div className={`border px-4 py-3 rounded-lg ${
+                                isBlocked 
+                                    ? 'bg-orange-100 border-orange-400 text-orange-700'
+                                    : 'bg-red-100 border-red-400 text-red-700'
+                            }`}>
+                                <div className="flex items-center gap-2">
+                                    {isBlocked ? (
+                                        <span className="text-lg">🔒</span>
+                                    ) : (
+                                        <span className="text-lg">❌</span>
+                                    )}
+                                    <div>
+                                        <p className="font-medium">{error}</p>
+                                        {isBlocked && remainingTime > 0 && (
+                                            <p className="text-sm mt-1">
+                                                Tiempo restante: {Math.floor(remainingTime / 60)} minutos {remainingTime % 60} segundos
+                                            </p>
+                                        )}
+                                        {!isBlocked && attemptsRemaining !== null && attemptsRemaining > 0 && (
+                                            <p className="text-sm mt-1">
+                                                ⚠️ Te quedan {attemptsRemaining} intento{attemptsRemaining !== 1 ? 's' : ''}
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
                         )}
                         {success && (
@@ -71,10 +100,21 @@ function LoginPage() {
                         </div>
                         <button
                             type="submit"
-                            disabled={loading}
-                            className="btn-primary w-full bg-primary text-white font-semibold py-3 px-4 rounded-lg transition duration-200 cursor-pointer" 
+                            disabled={loading || isBlocked}
+                            className={`w-full font-semibold py-3 px-4 rounded-lg transition duration-200 ${
+                                isBlocked 
+                                    ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                                    : loading
+                                        ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                                        : 'bg-primary text-white cursor-pointer hover:bg-primary-dark'
+                            }`}
                         >
-                            {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+                            {isBlocked 
+                                ? '🔒 Cuenta Bloqueada'
+                                : loading 
+                                    ? 'Iniciando sesión...' 
+                                    : 'Iniciar Sesión'
+                            }
                         </button>
                     </form>
                 </div>

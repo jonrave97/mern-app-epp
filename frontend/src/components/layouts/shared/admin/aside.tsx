@@ -28,7 +28,7 @@ export default function Aside({ sidebarOpen }: { sidebarOpen: boolean }) {
           <li className="px-3 pt-20  hover:rounded-base transition border border-transparent hover:border-gray-200">
             <a
               href="#"
-              className="flex items-center px-2 py-1.5 text-body rounded-base hover:text-fg-brand group"
+              className="flex items-center px-2 py-1.5 text-body rounded-base hover:text-fg-brand group transition-all duration-200 active:scale-95 active:bg-neutral-tertiary cursor-pointer transform hover:scale-[1.02]"
             >
               <DashboardIcon className="w-5 h-5 transition duration-75 group-hover:text-fg-brand" />
               <span className="ms-3">Dashboard</span>
@@ -38,7 +38,7 @@ export default function Aside({ sidebarOpen }: { sidebarOpen: boolean }) {
             <button
               type="button"
               onClick={() => toggleDropdown('users')}
-              className="flex items-center w-full justify-between px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group"
+              className="flex items-center w-full justify-between px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group transition-all duration-200 active:scale-95 active:bg-neutral-secondary-medium cursor-pointer transform hover:scale-[1.02]"
               aria-expanded={openDropdowns.users}
             >
               <UsersIcon className="shrink-0 w-5 h-5 transition duration-75 group-hover:text-fg-brand" />
@@ -57,14 +57,14 @@ export default function Aside({ sidebarOpen }: { sidebarOpen: boolean }) {
               <li>
                 <a
                   href="/admin/users"
-                  className="pl-10 flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group"
+                  className="pl-10 flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group transition-all duration-200 active:scale-95 active:bg-neutral-secondary-medium cursor-pointer transform hover:scale-[1.02]"
                 >
                   Lista de Usuarios</a>
               </li>
               <li>
                 <a
                   href="/admin/users/create"
-                  className="pl-10 flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group"
+                  className="pl-10 flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group transition-all duration-200 active:scale-95 active:bg-neutral-secondary-medium cursor-pointer transform hover:scale-[1.02]"
                 >
                   Crear Usuario
                 </a>
@@ -72,7 +72,7 @@ export default function Aside({ sidebarOpen }: { sidebarOpen: boolean }) {
               <li>
                 <a
                   href="/admin/permissions"
-                  className="pl-10 flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group"
+                  className="pl-10 flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group transition-all duration-200 active:scale-95 active:bg-neutral-secondary-medium cursor-pointer transform hover:scale-[1.02]"
                 >
                   Gestionar Permisos
                 </a>
@@ -80,7 +80,7 @@ export default function Aside({ sidebarOpen }: { sidebarOpen: boolean }) {
               <li>
                 <a
                   href="/admin/positions"
-                  className="pl-10 flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group"
+                  className="pl-10 flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group transition-all duration-200 active:scale-95 active:bg-neutral-secondary-medium cursor-pointer transform hover:scale-[1.02]"
                 >
                   Posiciones
                 </a>
@@ -90,7 +90,7 @@ export default function Aside({ sidebarOpen }: { sidebarOpen: boolean }) {
           <li className="px-3 hover:bg-gray-200 hover:rounded-base transition border border-transparent hover:border-gray-200">
             <a
               href="/admin/warehouses"
-              className="flex items-center px-2 py-1.5 text-body rounded-base hover:text-fg-brand group"
+              className="flex items-center px-2 py-1.5 text-body rounded-base hover:text-fg-brand group transition-all duration-200 active:scale-95 active:bg-neutral-tertiary cursor-pointer transform hover:scale-[1.02]"
             >
               <WarehouseIcon className="shrink-0 w-5 h-5 transition duration-75 group-hover:text-fg-brand" />
               <span className="flex-1 ms-3 whitespace-nowrap">Warehouse</span>
@@ -104,7 +104,7 @@ export default function Aside({ sidebarOpen }: { sidebarOpen: boolean }) {
             <button
               type="button"
               onClick={() => toggleDropdown('companies')}
-              className="flex items-center w-full justify-between px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group"
+              className="flex items-center w-full justify-between px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group transition-all duration-200 active:scale-95 active:bg-neutral-secondary-medium cursor-pointer transform hover:scale-[1.02]"
               aria-expanded={openDropdowns.companies}
             >
               <CompanyIcon className="shrink-0 w-5 h-5 transition duration-75 group-hover:text-fg-brand" />
@@ -123,7 +123,7 @@ export default function Aside({ sidebarOpen }: { sidebarOpen: boolean }) {
               <li>
                 <a
                   href="/admin/companies"
-                  className="pl-10 flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group"
+                  className="pl-10 flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group transition-all duration-200 active:scale-95 active:bg-neutral-secondary-medium cursor-pointer transform hover:scale-[1.02]"
                 >
                   Lista de Empresas
                 </a>
@@ -131,7 +131,7 @@ export default function Aside({ sidebarOpen }: { sidebarOpen: boolean }) {
               <li>
                 <a
                   href="/admin/areas"
-                  className="pl-10 flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group"
+                  className="pl-10 flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group transition-all duration-200 active:scale-95 active:bg-neutral-secondary-medium cursor-pointer transform hover:scale-[1.02]"
                 >
                   Áreas
                 </a>
@@ -143,7 +143,7 @@ export default function Aside({ sidebarOpen }: { sidebarOpen: boolean }) {
             <button
               type="button"
               onClick={() => toggleDropdown('epps')}
-              className="flex items-center w-full justify-between px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group"
+              className="flex items-center w-full justify-between px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group transition-all duration-200 active:scale-95 active:bg-neutral-secondary-medium cursor-pointer transform hover:scale-[1.02]"
               aria-expanded={openDropdowns.epps}
             >
               <EppsIcon className="shrink-0 w-5 h-5 transition duration-75 group-hover:text-fg-brand" />
@@ -162,7 +162,7 @@ export default function Aside({ sidebarOpen }: { sidebarOpen: boolean }) {
               <li>
                 <a
                   href="/admin/epps"
-                  className="pl-10 flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group"
+                  className="pl-10 flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group transition-all duration-200 active:scale-95 active:bg-neutral-secondary-medium cursor-pointer transform hover:scale-[1.02]"
                 >
                   Lista de EPPs
                 </a>
@@ -170,7 +170,7 @@ export default function Aside({ sidebarOpen }: { sidebarOpen: boolean }) {
               <li>
                 <a
                   href="/admin/categories"
-                  className="pl-10 flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group"
+                  className="pl-10 flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group transition-all duration-200 active:scale-95 active:bg-neutral-secondary-medium cursor-pointer transform hover:scale-[1.02]"
                 >
                   Categorías
                 </a>
@@ -182,7 +182,7 @@ export default function Aside({ sidebarOpen }: { sidebarOpen: boolean }) {
             <button
               type="button"
               onClick={() => toggleDropdown('ecommerce')}
-              className="flex items-center w-full justify-between px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group"
+              className="flex items-center w-full justify-between px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group transition-all duration-200 active:scale-95 active:bg-neutral-secondary-medium cursor-pointer transform hover:scale-[1.02]"
               aria-expanded={openDropdowns.ecommerce}
             >
               <svg
@@ -217,7 +217,7 @@ export default function Aside({ sidebarOpen }: { sidebarOpen: boolean }) {
               <li>
                 <a
                   href="#"
-                  className="pl-10 flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group"
+                  className="pl-10 flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group transition-all duration-200 active:scale-95 active:bg-neutral-secondary-medium cursor-pointer transform hover:scale-[1.02]"
                 >
                   Products
                 </a>
@@ -225,7 +225,7 @@ export default function Aside({ sidebarOpen }: { sidebarOpen: boolean }) {
               <li>
                 <a
                   href="#"
-                  className="pl-10 flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group"
+                  className="pl-10 flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group transition-all duration-200 active:scale-95 active:bg-neutral-secondary-medium cursor-pointer transform hover:scale-[1.02]"
                 >
                   Billing
                 </a>
@@ -233,7 +233,7 @@ export default function Aside({ sidebarOpen }: { sidebarOpen: boolean }) {
               <li>
                 <a
                   href="#"
-                  className="pl-10 flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group"
+                  className="pl-10 flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group transition-all duration-200 active:scale-95 active:bg-neutral-secondary-medium cursor-pointer transform hover:scale-[1.02]"
                 >
                   Invoice
                 </a>
