@@ -7,6 +7,7 @@ export {default as EditIcon} from './Edit';
 export {default as TrashIcon} from './Trash';
 export {default as ToggleIcon} from './Toggle';
 export {default as LockIcon} from './Lock';
+export {default as CompanyIcon} from './Company';
 export {default as DashboardIcon } from './Dashboard';
 export {default as  UsersIcon } from './Users';
 export {default as EppsIcon } from './Epps';
