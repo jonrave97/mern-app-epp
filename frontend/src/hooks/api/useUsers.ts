@@ -21,7 +21,7 @@ interface CacheEntry {
 }
 
 /** Duración del caché: 5 minutos */
-const CACHE_DURATION = 5 * 60 * 1000;
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutos en milisegundos
 
 /**
  * Hook personalizado para gestionar usuarios con paginación y caché en memoria
@@ -66,15 +66,21 @@ export const useUsers = (initialPage = 1, itemsPerPage = 10) => {
    */
   const fetchUsers = async (page: number, forceRefresh = false) => {
     const now = Date.now();
-    const cachedData = cache.current.get(page);
 
-    // Si hay datos en caché y no han expirado, usarlos
-    if (!forceRefresh && cachedData && (now - cachedData.timestamp) < CACHE_DURATION) {
-      setUsers(cachedData.users);
-      setPagination(cachedData.pagination);
-      setStats(cachedData.stats);
-      setLoading(false);
-      return;
+    // Verificar si tenemos datos en caché y si aún son válidos
+    if (!forceRefresh) {
+      const cachedEntry = cache.current.get(page);
+      if (cachedEntry) {
+        const cacheAge = now - cachedEntry.timestamp;
+        if (cacheAge < CACHE_DURATION) {
+          // Usar datos del caché
+          setUsers(cachedEntry.users);
+          setPagination(cachedEntry.pagination);
+          setStats(cachedEntry.stats);
+          setLoading(false);
+          return;
+        }
+      }
     }
 
     setLoading(true);
@@ -113,13 +119,12 @@ export const useUsers = (initialPage = 1, itemsPerPage = 10) => {
     cache.current.clear();
     setCurrentPage(1);
     setRefreshTrigger(prev => prev + 1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchTerm]);
 
   useEffect(() => {
     fetchUsers(currentPage);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, refreshTrigger]);
+  }, [currentPage, refreshTrigger, itemsPerPage, searchTerm]);
 
   const goToPage = (page: number) => {
     if (page >= 1 && (!pagination || page <= pagination.totalPages)) {

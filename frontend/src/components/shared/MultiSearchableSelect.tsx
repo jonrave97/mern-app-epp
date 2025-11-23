@@ -73,7 +73,10 @@ export const MultiSearchableSelect = ({
     inputRef.current?.focus();
   };
 
-  const handleRemove = (optionValue: string) => {
+  const handleRemove = (optionValue: string, e?: React.MouseEvent) => {
+    if (e) {
+      e.stopPropagation();
+    }
     const newValues = value.filter(v => v !== optionValue);
     onChange(newValues);
   };
@@ -82,49 +85,49 @@ export const MultiSearchableSelect = ({
     <div ref={dropdownRef} className={`relative ${className}`}>
       {/* Input display con tags */}
       <div
-        onClick={() => !disabled && !loading && setIsOpen(!isOpen)}
-        className={`w-full px-4 py-2 border rounded-lg cursor-pointer flex items-center flex-wrap gap-2 ${
+        className={`w-full px-4 py-2 border rounded-lg flex items-center flex-wrap gap-2 ${
           disabled || loading
             ? 'bg-gray-100 cursor-not-allowed'
-            : 'bg-white hover:border-gray-400'
+            : 'bg-white hover:border-gray-400 cursor-pointer'
         } ${isOpen ? 'ring-2 ring-gray-300 border-gray-300' : 'border-gray-300'}`}
         style={{ minHeight: '42px' }}
+        onClick={() => !disabled && !loading && inputRef.current?.focus()}
       >
-        {selectedOptions.length > 0 ? (
-          selectedOptions.map(option => (
-            <div
-              key={option.value}
-              className="bg-primary text-white px-3 py-1 rounded-full text-sm flex items-center gap-2"
+        {selectedOptions.map(option => (
+          <div
+            key={option.value}
+            className="bg-primary text-white px-3 py-1 rounded-full text-sm flex items-center gap-2"
+          >
+            <span>{option.label}</span>
+            <button
+              onClick={(e) => handleRemove(option.value, e)}
+              className="hover:opacity-70 transition font-bold"
+              type="button"
             >
-              <span>{option.label}</span>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleRemove(option.value);
-                }}
-                className="hover:opacity-70 transition"
-              >
-                ✕
-              </button>
-            </div>
-          ))
-        ) : (
-          <span className="text-gray-400">{placeholder}</span>
-        )}
-      </div>
-
-      {/* Search input cuando está abierto */}
-      {isOpen && !disabled && !loading && (
+              ✕
+            </button>
+          </div>
+        ))}
+        
+        {/* Input field para búsqueda */}
         <input
           ref={inputRef}
           type="text"
-          placeholder="Buscar..."
+          placeholder={selectedOptions.length === 0 ? placeholder : ''}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="absolute top-0 left-0 right-0 px-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-gray-300 z-10"
-          autoFocus
+          onFocus={() => setIsOpen(true)}
+          onKeyDown={(e) => {
+            // Permitir borrar el último tag con backspace
+            if (e.key === 'Backspace' && searchTerm === '' && value.length > 0) {
+              handleRemove(value[value.length - 1]);
+            }
+          }}
+          disabled={disabled || loading}
+          className="flex-1 min-w-32 outline-none bg-transparent text-gray-900"
+          style={{ minHeight: '26px' }}
         />
-      )}
+      </div>
 
       {/* Dropdown list */}
       {isOpen && !disabled && !loading && (

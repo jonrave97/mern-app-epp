@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useUsers } from '@hooks/api/useUsers';
 import { createUser, updateUser } from '@services/userService';
 import { useModal } from '@hooks/modal/useModal';
@@ -19,6 +19,11 @@ function UserListPage() {
   const toggleStatusModal = useModal<User>();
   const { actionError, successMessage, clearMessages, handleError, handleSuccess } = useCrudActions();
   const [actionLoading, setActionLoading] = useState(false);
+
+  // Forzar actualización al montar el componente para asegurar datos frescos
+  useEffect(() => {
+    refresh();
+  }, []);
 
   const isInitialLoading = loading && users.length === 0 && !searchTerm;
 
@@ -184,7 +189,7 @@ function UserListPage() {
               <th className="px-6 py-4 text-left font-semibold">Nombre</th>
               <th className="px-6 py-4 text-left font-semibold">Email</th>
               <th className="px-6 py-4 text-left font-semibold">Rol</th>
-              <th className="px-6 py-4 text-left font-semibold">Jefatura/Aprobador</th>
+              <th className="px-6 py-4 text-left font-semibold">Área</th>
               <th className="px-6 py-4 text-left font-semibold">Estado</th>
               <th className="px-6 py-4 text-left font-semibold">Acciones</th>
             </tr>
@@ -210,9 +215,7 @@ function UserListPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-gray-600">
-                    {user.approverId && typeof user.approverId === 'object' 
-                      ? (user.approverId as any).name || 'N/A'
-                      : 'Sin asignar'}
+                    {user.area || 'Sin asignar'}
                   </td>
                   <td className="px-6 py-4">
                     <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${

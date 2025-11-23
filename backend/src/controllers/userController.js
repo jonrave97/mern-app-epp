@@ -13,6 +13,7 @@ export const getAllUsers = async (req, res) => {
     const skip = (page - 1) * limit;
     const search = req.query.search || '';
     const rol = req.query.rol || '';
+    const disabled = req.query.disabled || '';
 
     // Filtro de búsqueda
     const searchFilter = search
@@ -29,10 +30,24 @@ export const getAllUsers = async (req, res) => {
       searchFilter.rol = rol;
     }
 
+    // Agregar filtro de estado disabled si se proporciona
+    if (disabled === 'true') {
+      searchFilter.disabled = true;
+    } else if (disabled === 'false') {
+      searchFilter.disabled = { $ne: true };
+    }
+
     const users = await User.find(searchFilter)
       .select('-password -token')
+      .lean() // Usar lean() para mejor rendimiento
       .skip(skip)
       .limit(limit);
+
+    // Asegurar que disabled esté presente en cada usuario
+    const usersWithDisabled = users.map(user => ({
+      ...user,
+      disabled: user.disabled === true // Explícitamente convertir a booleano
+    }));
 
     // Total filtrado (para paginación)
     const totalFiltered = await User.countDocuments(searchFilter);
@@ -45,8 +60,8 @@ export const getAllUsers = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      users: users,
-      data: users,
+      users: usersWithDisabled,
+      data: usersWithDisabled,
       pagination: {
         currentPage: page,
         totalPages: totalPages,

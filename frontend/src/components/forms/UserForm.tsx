@@ -26,6 +26,7 @@ interface JefaturaUser {
   name: string;
   email: string;
   rol: string;
+  disabled?: boolean;
 }
 
 interface UserFormProps {
@@ -82,7 +83,8 @@ export function UserForm({ onSubmit, onCancel, initialData, isEditing = false }:
       try {
         const response = await getJefaturaUsers();
         if (response.users) {
-          setJefaturaUsers(response.users);
+          // Filtrar solo usuarios activos (disabled !== true)
+          setJefaturaUsers(response.users.filter((user: JefaturaUser) => !user.disabled));
         }
       } catch (error) {
         console.error('Error al cargar usuarios de jefatura:', error);
