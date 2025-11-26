@@ -37,6 +37,8 @@ export const useLogin = () => {
       const response = await loginUser(email, password);
       
       console.log('✅ Login exitoso:', response);
+      console.log('el rol del usuario es:', response.rol);
+      
       setSuccess(true);
       
       // Guardar token en localStorage
@@ -54,9 +56,15 @@ export const useLogin = () => {
       // Limpiar formulario
       setEmail('');
       setPassword('');
+      if(response.rol === 'user') {
+        // Redirigir al dashboard del usuario
+        navigate('/dashboard');
+        console.log('El tipo de rol es:', response.rol);
+      }
 
-      // Redirigir al dashboard del admin
-      navigate('/admin/dashboard');
+      // // Redirigir al dashboard del admin
+      // navigate('/admin/dashboard');
+      // console.log('El tipo de rol es:', response.rol);
 
     } catch (err: any) {
         // Manejo de errores

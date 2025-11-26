@@ -8,7 +8,7 @@ import { ModalActions } from '@components/shared/ModalActions';
 import { Pagination } from '@components/shared/Pagination';
 import { MultiCheckboxSelect } from '@components/shared/MultiCheckboxSelect';
 import { UserForm } from '@components/forms/UserForm';
-import { EditIcon, LockIcon } from '@components/icons';
+import { EditIcon, LockIcon, UserIcon , SearchIcon} from '@components/icons';
 import { usePageTitle } from '@hooks/page/usePageTitle';
 import type { User } from '../../../types/user';
 
@@ -50,22 +50,33 @@ function UserListPage() {
   // Actualizar selectedBosses cuando se abre el modal
   useEffect(() => {
     if (bossesModal.isOpen && bossesModal.selectedItem) {
+      console.log('Usuario seleccionado (desde modal):', bossesModal.selectedItem.bosses);
       // Extraer los IDs de los bosses del usuario
       const bossesIds = bossesModal.selectedItem.bosses?.map(b => {
         // boss puede ser un string (ID) o un objeto con _id y name
-        if (typeof b.boss === 'string') {
-          return b.boss;
-        } else if (b.boss && typeof b.boss === 'object' && '_id' in b.boss) {
-          return b.boss._id;
-        }
-        return '';
-      }).filter(Boolean) || [];
+        // if (typeof b.boss === 'string') {
+        //   return b.boss;
+        // } else if (b.boss && typeof b.boss === 'object' && '_id' in b.boss) {
+        //   return b.boss._id;
+        // }
+        if(typeof b === 'string') return b;
+        if(b && typeof b === 'object'  && b._id) {
+          // if (typeof b.boss === 'string') return b.boss;
+          console.log('Objeto boss encontrado:', b); 
+          return b._id;
+      }
+       return 'nada';
+      });
       setSelectedBosses(bossesIds);
+      console.log('Jefes actuales del usuario:', bossesIds);
     } else {
       // Limpiar cuando se cierra el modal
       setSelectedBosses([]);
     }
+    
   }, [bossesModal.isOpen, bossesModal.selectedItem]);
+
+
 
   const isInitialLoading = loading && users.length === 0 && !searchTerm;
 
@@ -119,6 +130,7 @@ function UserListPage() {
     setActionLoading(true);
     clearMessages();
     try {
+      
       await updateUser(bossesModal.selectedItem._id, { bosses });
       bossesModal.close();
       await refresh();
@@ -133,6 +145,11 @@ function UserListPage() {
   const totalUsers = stats?.total || 0;
   const activeUsers = stats?.active || 0;
   const inactiveUsers = stats?.inactive || 0;
+
+
+
+  // console.log('🧑‍💼 Jefatura Users:', jefaturaUsers);
+  // console.log('usuario seleccionado bossesModal:', );
 
   return (
     <div className="p-6 min-h-screen">
@@ -159,9 +176,7 @@ function UserListPage() {
               <h3 className="text-3xl font-bold text-gray-900">{totalUsers}</h3>
             </div>
             <div className="bg-primary-light p-3 rounded-full">
-              <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
+              <UserIcon />
             </div>
           </div>
         </div>
@@ -205,19 +220,7 @@ function UserListPage() {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-300"
           />
-          <svg
-            className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            />
-          </svg>
+          <SearchIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
         </div>
       </div>
 
@@ -294,7 +297,7 @@ function UserListPage() {
                         <EditIcon className="w-5 h-5" />
                       </button>
                       <button 
-                        onClick={() => bossesModal.open(user)}
+                        onClick={() => {bossesModal.open(user); console.log('Usuario seleccionado para asignar jefes:', user);}}
                         className="text-blue-500 hover:text-blue-700 transition-colors p-1 hover:bg-blue-50 rounded cursor-pointer"
                         title="Asignar jefes"
                       >
@@ -424,6 +427,7 @@ function UserListPage() {
         title={`Asignar Jefes - ${bossesModal.selectedItem?.name}`}
         size="lg"
       >
+        
         {actionError && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4">
             ❌ {actionError}
@@ -435,12 +439,13 @@ function UserListPage() {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Selecciona los jefes para {bossesModal.selectedItem.name}
               </label>
+            
               <MultiCheckboxSelect
-                options={jefaturaUsers.map(user => ({
-                  value: user._id,
-                  label: user.name,
-                  subtitle: user.email
-                }))}
+                options={jefaturaUsers .map(u => ({
+                  value: String(u._id).trim(),
+                  label: u.name,
+                  subtitle: u.email
+                }))} 
                 value={selectedBosses}
                 onChange={setSelectedBosses}
                 placeholder="Seleccionar jefes..."

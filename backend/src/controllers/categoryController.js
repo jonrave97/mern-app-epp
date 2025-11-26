@@ -1,6 +1,11 @@
 import Category from '../models/categoryModel.js';
 
-// Obtener todas las categorías con paginación y búsqueda
+/**
+ * Obtiene todas las categorías con paginación y búsqueda.
+ * @param {Object} req - Objeto de solicitud con parámetros de consulta (page, limit, search).
+ * @param {Object} res - Objeto de respuesta.
+ * @returns {Object} Respuesta JSON con categorías, información de paginación y estadísticas generales.
+ */
 export const getAllCategories = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
@@ -9,8 +14,8 @@ export const getAllCategories = async (req, res) => {
         const search = req.query.search || '';
 
         // Crear filtro de búsqueda
-        const searchFilter = search 
-            ? { 
+        const searchFilter = search
+            ? {
                 $or: [
                     { name: { $regex: search, $options: 'i' } },
                     { description: { $regex: search, $options: 'i' } }
@@ -26,7 +31,7 @@ export const getAllCategories = async (req, res) => {
 
         // Contar totales con filtro de búsqueda (para paginación)
         const totalFiltered = await Category.countDocuments(searchFilter);
-        
+
         // Estadísticas generales (sin filtro de búsqueda)
         const totalGeneral = await Category.countDocuments();
         const activeGeneral = await Category.countDocuments({ disabled: { $ne: true } });
@@ -54,7 +59,12 @@ export const getAllCategories = async (req, res) => {
     }
 };
 
-// Crear nueva categoría
+/**
+ * Crea una nueva categoría.
+ * @param {Object} req - Objeto de solicitud con name y description en el cuerpo.
+ * @param {Object} res - Objeto de respuesta.
+ * @returns {Object} Respuesta JSON con mensaje de éxito y la categoría creada.
+ */
 export const createCategory = async (req, res) => {
     try {
         const { name, description } = req.body;
@@ -87,7 +97,12 @@ export const createCategory = async (req, res) => {
     }
 };
 
-// Actualizar categoría
+/**
+ * Actualiza una categoría existente.
+ * @param {Object} req - Objeto de solicitud con id en params y campos a actualizar (name, description, disabled).
+ * @param {Object} res - Objeto de respuesta.
+ * @returns {Object} Respuesta JSON con mensaje de éxito y la categoría actualizada.
+ */
 export const updateCategory = async (req, res) => {
     try {
         const { id } = req.params;

@@ -13,4 +13,5 @@ export {default as  UsersIcon } from './Users';
 export {default as EppsIcon } from './Epps';
 export {default as ChevronDownIcon } from './ChevronDown';
 export {default as SearchIcon } from './Search';
+export {default as UserIcon} from './UserIcon';
 

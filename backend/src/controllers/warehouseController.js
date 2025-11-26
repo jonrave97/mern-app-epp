@@ -1,5 +1,11 @@
 import warehosemodels from '../models/warehouseModel.js';
 
+/**
+ * Obtiene todas las bodegas con paginación y búsqueda.
+ * @param {Object} req - Objeto de solicitud con parámetros de consulta (page, limit, search).
+ * @param {Object} res - Objeto de respuesta.
+ * @returns {Object} Respuesta JSON con bodegas, información de paginación y estadísticas.
+ */
 export const getAllWarehouses = async (req, res) => {
   try {
     // Obtener parámetros de paginación desde query params
@@ -55,6 +61,12 @@ export const getAllWarehouses = async (req, res) => {
   }
 };
 
+/**
+ * Crea una nueva bodega.
+ * @param {Object} req - Objeto de solicitud con code y name en el cuerpo.
+ * @param {Object} res - Objeto de respuesta.
+ * @returns {Object} Respuesta JSON con mensaje de éxito y la bodega creada.
+ */
 export const createWarehouse = async (req, res) => {
   try {
     const { code, name } = req.body;
@@ -102,6 +114,12 @@ export const createWarehouse = async (req, res) => {
   }
 };
 
+/**
+ * Actualiza una bodega existente.
+ * @param {Object} req - Objeto de solicitud con id en params y campos a actualizar (code, name, disabled).
+ * @param {Object} res - Objeto de respuesta.
+ * @returns {Object} Respuesta JSON con mensaje de éxito y la bodega actualizada.
+ */
 export const updateWarehouse = async (req, res) => {
   try {
     const { id } = req.params;
@@ -148,6 +166,12 @@ export const updateWarehouse = async (req, res) => {
   }
 };
 
+/**
+ * Elimina una bodega existente.
+ * @param {Object} req - Objeto de solicitud con id en params.
+ * @param {Object} res - Objeto de respuesta.
+ * @returns {Object} Respuesta JSON con mensaje de éxito y la bodega eliminada.
+ */
 export const deleteWarehouse = async (req, res) => {
   try {
     const { id } = req.params;
