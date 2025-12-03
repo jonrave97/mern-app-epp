@@ -9,46 +9,36 @@ const api = axios.create({
     },
 });
 
-// Request interceptor (ver qué se envía)
-// api.interceptors.request.use(
-//   (config) => {
-//     console.log('📤 Enviando petición:', {
-//       method: config.method,
-//       url: config.url,
-//       baseURL: config.baseURL,
-//       data: config.data
-//     });
-//     return config;
-//   },
-//   (error) => {
-//     console.error('❌ Error en request:', error);
-//     return Promise.reject(error);
-//   }
-// );
+// Request interceptor - Agregar token automáticamente a todas las peticiones
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
-// // Response interceptor (ver qué se recibe)
-// api.interceptors.response.use(
-//   (response) => {
-//     console.log('📥 Respuesta recibida:', {
-//       status: response.status,
-//       data: response.data,
-//       url: response.config.url
-//     });
-//     return response;
-//   },
-//   (error) => {
-//     console.error('❌ Error en response:', {
-//       status: error.response?.status,
-//       data: error.response?.data,
-//       message: error.message
-//     });
-//     return Promise.reject(error);
-//   }
-// );
-// registro de usuarios
-// const registerUser = async (userData:{ email: string; password: string }) => {
-//    const response = await api.post('/register', userData);
-//         return response.data;
-// };
+// Response interceptor - Manejar errores de autenticación
+api.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    // Si el token expiró o es inválido, redirigir al login
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+    }
+    
+    return Promise.reject(error);
+  }
+);
 
 export default api;

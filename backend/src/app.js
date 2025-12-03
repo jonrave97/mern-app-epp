@@ -10,6 +10,7 @@ import positionRoutes from './routes/positionRoutes.js';
 import eppRoutes from './routes/eppRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
 import permissionRoutes from './routes/permissionRoutes.js';
+import requestRoutes from './routes/requestRoutes.js';
 import {connectDB} from './database/db.js';
 
 dotenv.config(); // Cargar variables de entorno
@@ -17,7 +18,6 @@ const app = express(); // Crear la aplicación de Express
 
 // Definicion de URL de Frontend
 const whiteList = [process.env.FRONTEND_URL];
-// const whiteList = ['http://localhost:5173'];
 
 // Impresion por consola de la URL del Frontend
 console.log('🚀 Frontend URL:', whiteList);
@@ -25,30 +25,13 @@ console.log('🚀 Frontend URL:', whiteList);
 // ========== MIDDLEWARES (DEBEN IR ANTES DE LAS RUTAS) ==========
 app.use(morgan('dev')); // Middleware para registrar solicitudes HTTP
 
-// Middleware de debug ANTES de parsear JSON
-// app.use((req, res, next) => {
-//     console.log('📥 Headers recibidos:', {
-//         'content-type': req.headers['content-type'],
-//         'content-length': req.headers['content-length']
-//     });
-//     next();
-// });
-
 app.use(express.json()); // Habilitar el parseo de JSON en las solicitudes
 app.use(express.urlencoded({ extended: true })); // Para datos en formularios
 
-// Middleware de debug DESPUÉS de parsear JSON
-// app.use((req, res, next) => {
-//     console.log('📨 req.body después de JSON parser:', req.body);
-//     next();
-// });
 
 // Configuración de CORS
 app.use(cors({
     origin: function(origin, callback) {
-        console.log(origin,'<< origin recibido');        console.log('🔍 includes result:', whiteList.includes(origin));
-        console.log('🔍 whiteList[0] === origin:', whiteList[0] === origin);
-        console.log(whiteList[0],'Imprimiendo WHITELIST[0]');
         if (whiteList.includes(origin)) {
             // Puede consultar la API
             console.log('✅ Solicitud CORS permitida:', origin);
@@ -76,6 +59,7 @@ app.use('/api/positions', positionRoutes);
 app.use('/api/epps', eppRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/permissions', permissionRoutes);
+app.use('/api/requests', requestRoutes);
 
 // ========== INICIAR SERVIDOR ==========
 // Primero conectar a la base de datos, luego iniciar el servidor

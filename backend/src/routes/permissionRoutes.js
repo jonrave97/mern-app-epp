@@ -1,6 +1,7 @@
 import express from 'express';
 import PermissionController from '../controllers/permissionController.js';
 import { requireRoles } from '../middlewares/permissionMiddleware.js';
+import { verifyToken } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 
@@ -16,6 +17,16 @@ const tempAuthMiddleware = (req, res, next) => {
 
 // Middleware para verificar que el usuario es administrador
 const requireAdmin = requireRoles(['Administrador']);
+
+/**
+ * @route   GET /api/permissions/my-permissions
+ * @desc    Obtener permisos del usuario autenticado
+ * @access  Usuarios autenticados
+ */
+router.get('/my-permissions', 
+  verifyToken,
+  PermissionController.getMyPermissions
+);
 
 /**
  * @route   GET /api/permissions/users

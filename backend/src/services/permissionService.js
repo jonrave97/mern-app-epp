@@ -64,27 +64,65 @@ class PermissionService {
 
   /**
    * Obtiene todos los usuarios con sus permisos para el panel de administración
+   * Optimizado con agregación para evitar N+1 queries
    */
   static async getAllUsersWithPermissions() {
     try {
-      const users = await User.find({ disabled: false })
-        .select('name email rol area costCenter')
-        .lean();
-      
-      const usersWithPermissions = await Promise.all(
-        users.map(async (user) => {
-          const permissions = await UserPermission.findOne({ 
-            userId: user._id, 
-            isActive: true 
-          });
-          
-          return {
-            ...user,
-            permissions: permissions ? permissions.permissions : null,
-            hasCustomPermissions: !!permissions
-          };
-        })
-      );
+      const usersWithPermissions = await User.aggregate([
+        // Filtrar usuarios activos
+        { $match: { disabled: false } },
+        
+        // Join con UserPermission
+        {
+          $lookup: {
+            from: 'userpermissions', // Nombre de la colección en MongoDB
+            let: { userId: '$_id' },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [
+                      { $eq: ['$userId', '$$userId'] },
+                      { $eq: ['$isActive', true] }
+                    ]
+                  }
+                }
+              },
+              { $limit: 1 }
+            ],
+            as: 'permissionData'
+          }
+        },
+        
+        // Proyectar los campos necesarios
+        {
+          $project: {
+            _id: 1,
+            name: 1,
+            email: 1,
+            rol: 1,
+            area: 1,
+            costCenter: 1,
+            permissions: {
+              $cond: {
+                if: { $gt: [{ $size: '$permissionData' }, 0] },
+                then: { $arrayElemAt: ['$permissionData.permissions', 0] },
+                else: null
+              }
+            },
+            hasCustomPermissions: {
+              $cond: {
+                if: { $gt: [{ $size: '$permissionData' }, 0] },
+                then: true,
+                else: false
+              }
+            }
+          }
+        },
+        
+        // Ordenar por nombre
+        { $sort: { name: 1 } }
+      ]);
       
       return usersWithPermissions;
     } catch (error) {

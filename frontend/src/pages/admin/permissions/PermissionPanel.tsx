@@ -50,7 +50,7 @@ interface PermissionStructure {
   };
 }
 
-const PermissionPanel: React.FC = () => {
+const PermissionPanel = () => {
   usePageTitle('Panel de Permisos');
   
   const [users, setUsers] = useState<UserWithPermissions[]>([]);

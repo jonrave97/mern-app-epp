@@ -8,7 +8,7 @@ import { ModalActions } from '@components/shared/ModalActions';
 import { Pagination } from '@components/shared/Pagination';
 import { MultiCheckboxSelect } from '@components/shared/MultiCheckboxSelect';
 import { UserForm } from '@components/forms/UserForm';
-import { EditIcon, LockIcon, UserIcon , SearchIcon} from '@components/icons';
+import { EditIcon, LockIcon, UserIcon, SearchIcon, CheckCircle } from '@components/icons';
 import { usePageTitle } from '@hooks/page/usePageTitle';
 import type { User } from '../../../types/user';
 
@@ -25,11 +25,9 @@ function UserListPage() {
   const [loadingJefatura, setLoadingJefatura] = useState(false);
   const [selectedBosses, setSelectedBosses] = useState<string[]>([]);
 
-  // Forzar actualización al montar el componente para asegurar datos frescos
+  // Cargar jefatura users al montar el componente
   useEffect(() => {
-    refresh();
     loadJefaturaUsers();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Cargar jefatura users
@@ -53,12 +51,6 @@ function UserListPage() {
       console.log('Usuario seleccionado (desde modal):', bossesModal.selectedItem.bosses);
       // Extraer los IDs de los bosses del usuario
       const bossesIds = bossesModal.selectedItem.bosses?.map(b => {
-        // boss puede ser un string (ID) o un objeto con _id y name
-        // if (typeof b.boss === 'string') {
-        //   return b.boss;
-        // } else if (b.boss && typeof b.boss === 'object' && '_id' in b.boss) {
-        //   return b.boss._id;
-        // }
         if(typeof b === 'string') return b;
         if(b && typeof b === 'object'  && b._id) {
           // if (typeof b.boss === 'string') return b.boss;
@@ -67,7 +59,7 @@ function UserListPage() {
       }
        return 'nada';
       });
-      setSelectedBosses(bossesIds);
+      setSelectedBosses(bossesIds || []);
       console.log('Jefes actuales del usuario:', bossesIds);
     } else {
       // Limpiar cuando se cierra el modal
@@ -180,6 +172,7 @@ function UserListPage() {
             </div>
           </div>
         </div>
+       
 
         <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-green-500">
           <div className="flex items-center justify-between">
@@ -188,9 +181,7 @@ function UserListPage() {
               <h3 className="text-3xl font-bold text-gray-900">{activeUsers}</h3>
             </div>
             <div className="bg-green-100 p-3 rounded-full">
-              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+              <CheckCircle size="md" color="text-green-600" />
             </div>
           </div>
         </div>
@@ -301,7 +292,7 @@ function UserListPage() {
                         className="text-blue-500 hover:text-blue-700 transition-colors p-1 hover:bg-blue-50 rounded cursor-pointer"
                         title="Asignar jefes"
                       >
-                        👔
+                        
                       </button>
                       <button 
                         onClick={() => toggleStatusModal.open(user)}
@@ -376,9 +367,9 @@ function UserListPage() {
               name: editModal.selectedItem.name,
               email: editModal.selectedItem.email,
               rol: editModal.selectedItem.rol,
-              area: editModal.selectedItem.area,
-              costCenter: editModal.selectedItem.costCenter,
-              company: editModal.selectedItem.company
+              area: editModal.selectedItem.area || '',
+              costCenter: editModal.selectedItem.costCenter || '',
+              company: editModal.selectedItem.company || ''
             }}
             isEditing={true}
           />

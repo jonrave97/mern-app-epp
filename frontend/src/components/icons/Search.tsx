@@ -2,7 +2,7 @@ interface SearchIconProps {
   className?: string;
 }
 
-const SearchIcon: React.FC<SearchIconProps> = ({ className = "w-5 h-5" }) => {
+const SearchIcon = ({ className = "w-5 h-5" }: SearchIconProps) => {
   return (
     <svg
       className={className}

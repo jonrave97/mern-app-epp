@@ -38,26 +38,27 @@ export const getAllUsers = async (req, res) => {
       searchFilter.disabled = { $ne: true };
     }
 
-    const users = await User.find(searchFilter)
-      .select('-password -token')
-      .lean() // Usar lean() para mejor rendimiento
-      .skip(skip)
-      .limit(limit);
+    // Ejecutar consultas en paralelo para mejor rendimiento
+    const [users, totalFiltered, totalGeneral, activeGeneral, inactiveGeneral] = await Promise.all([
+      User.find(searchFilter)
+        .select('-password -token')
+        .lean()
+        .skip(skip)
+        .limit(limit)
+        .sort({ createdAt: -1 }), // Agregar sort para consistencia
+      User.countDocuments(searchFilter),
+      User.countDocuments(),
+      User.countDocuments({ disabled: { $ne: true } }),
+      User.countDocuments({ disabled: true })
+    ]);
 
     // Asegurar que disabled esté presente en cada usuario
     const usersWithDisabled = users.map(user => ({
       ...user,
-      disabled: user.disabled === true // Explícitamente convertir a booleano
+      disabled: user.disabled === true
     }));
 
-    // Total filtrado (para paginación)
-    const totalFiltered = await User.countDocuments(searchFilter);
     const totalPages = Math.ceil(totalFiltered / limit);
-
-    // Estadísticas generales (sin filtro de búsqueda)
-    const totalGeneral = await User.countDocuments();
-    const activeGeneral = await User.countDocuments({ disabled: { $ne: true } });
-    const inactiveGeneral = await User.countDocuments({ disabled: true });
 
     return res.status(200).json({
       success: true,
@@ -94,45 +95,56 @@ export const createUser = async (req, res) => {
       });
     }
 
-    // Validar que la empresa exista si se proporciona
+    // Ejecutar validaciones en paralelo
+    const validationPromises = [];
+    
+    // Validar empresa si se proporciona
     if (company) {
-      const companyExists = await Company.findOne({ name: company, disabled: { $ne: true } });
-      if (!companyExists) {
-        return res.status(400).json({ 
-          message: "La empresa seleccionada no es válida o está inactiva" 
-        });
-      }
+      validationPromises.push(
+        Company.findOne({ name: company, disabled: { $ne: true } }).lean()
+          .then(companyExists => {
+            if (!companyExists) throw new Error("La empresa seleccionada no es válida o está inactiva");
+          })
+      );
     }
 
-    // Validar que el área exista si se proporciona
+    // Validar área si se proporciona
     if (area) {
-      const areaExists = await Area.findOne({ name: area, disabled: { $ne: true } });
-      if (!areaExists) {
-        return res.status(400).json({ 
-          message: "El área seleccionada no es válida o está inactiva" 
-        });
-      }
+      validationPromises.push(
+        Area.findOne({ name: area, disabled: { $ne: true } }).lean()
+          .then(areaExists => {
+            if (!areaExists) throw new Error("El área seleccionada no es válida o está inactiva");
+          })
+      );
     }
 
-    // Validar que los aprobadores/jefes existan si se proporcionan
+    // Validar que no exista el email
+    validationPromises.push(
+      User.findOne({ email }).lean()
+        .then(existingUser => {
+          if (existingUser) throw new Error("Ya existe un usuario con ese email");
+        })
+    );
+
+    // Validar aprobadores si se proporcionan
     let bossesList = [];
     if (approverIds && approverIds.length > 0) {
-      for (const approverId of approverIds) {
-        const approverExists = await User.findById(approverId);
-        if (!approverExists) {
-          return res.status(400).json({ 
-            message: `El jefe/aprobador con ID ${approverId} no existe` 
-          });
-        }
-        bossesList.push({ boss: approverId });
-      }
+      validationPromises.push(
+        User.find({ _id: { $in: approverIds } }).select('_id').lean()
+          .then(approvers => {
+            if (approvers.length !== approverIds.length) {
+              throw new Error("Uno o más jefes/aprobadores no existen");
+            }
+            bossesList = approverIds.map(id => ({ boss: id }));
+          })
+      );
     }
 
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ 
-        message: "Ya existe un usuario con ese email" 
-      });
+    // Ejecutar todas las validaciones en paralelo
+    try {
+      await Promise.all(validationPromises);
+    } catch (validationError) {
+      return res.status(400).json({ message: validationError.message });
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -178,80 +190,95 @@ export const updateUser = async (req, res) => {
     const { id } = req.params;
     const { name, email, password, rol, disabled, company, area, approverIds, bosses } = req.body;
 
-    const user = await User.findById(id);
+    const user = await User.findById(id).lean();
+    console.log('Usuario encontrado para actualización:', user);
     if (!user) {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
 
-    // Validar que la empresa exista si se proporciona
+    // Ejecutar validaciones en paralelo
+    const validationPromises = [];
+
+    // Validar empresa si se proporciona
     if (company) {
-      const companyExists = await Company.findOne({ name: company, disabled: { $ne: true } });
-      if (!companyExists) {
-        return res.status(400).json({ 
-          message: "La empresa seleccionada no es válida o está inactiva" 
-        });
-      }
+      validationPromises.push(
+        Company.findOne({ name: company, disabled: { $ne: true } }).lean()
+          .then(companyExists => {
+            if (!companyExists) throw new Error("La empresa seleccionada no es válida o está inactiva");
+          })
+      );
     }
 
-    // Validar que el área exista si se proporciona
+    // Validar área si se proporciona
     if (area) {
-      const areaExists = await Area.findOne({ name: area, disabled: { $ne: true } });
-      if (!areaExists) {
-        return res.status(400).json({ 
-          message: "El área seleccionada no es válida o está inactiva" 
-        });
-      }
+      validationPromises.push(
+        Area.findOne({ name: area, disabled: { $ne: true } }).lean()
+          .then(areaExists => {
+            if (!areaExists) throw new Error("El área seleccionada no es válida o está inactiva");
+          })
+      );
     }
 
-    // Validar que los aprobadores/jefes existan si se proporcionan (soporta bosses y approverIds)
-    const bossesInput = bosses || approverIds;
-    if (bossesInput !== undefined) {
-      let bossesList = [];
-      if (bossesInput && bossesInput.length > 0) {
-        for (const approverId of bossesInput) {
-          const approverExists = await User.findById(approverId);
-          if (!approverExists) {
-            return res.status(400).json({ 
-              message: `El jefe/aprobador con ID ${approverId} no existe` 
-            });
-          }
-          bossesList.push({ boss: approverId });
-        }
-      }
-      user.bosses = bossesList;
-    }
-
+    // Validar email único si cambió
     if (email && email !== user.email) {
-      const existingUser = await User.findOne({ email });
-      if (existingUser) {
-        return res.status(400).json({ 
-          message: "Ya existe un usuario con ese email" 
-        });
-      }
+      validationPromises.push(
+        User.findOne({ email }).lean()
+          .then(existingUser => {
+            if (existingUser) throw new Error("Ya existe un usuario con ese email");
+          })
+      );
     }
 
-    if (name) user.name = name.trim();
-    if (email) user.email = email.trim().toLowerCase();
-    if (rol) user.rol = rol;
-    if (disabled !== undefined) user.disabled = disabled;
-    if (company !== undefined) user.company = company || undefined;
-    if (area !== undefined) user.area = area || undefined;
+    // Validar aprobadores/jefes
+    const bossesInput = bosses || approverIds;
+    let bossesList = [];
+    if (bossesInput !== undefined && bossesInput.length > 0) {
+      validationPromises.push(
+        User.find({ _id: { $in: bossesInput } }).select('_id').lean()
+          .then(approvers => {
+            if (approvers.length !== bossesInput.length) {
+              throw new Error("Uno o más jefes/aprobadores no existen");
+            }
+            bossesList = bossesInput.map(id => ({ boss: id }));
+          })
+      );
+    } else if (bossesInput !== undefined) {
+      bossesList = [];
+    }
+
+    // Ejecutar todas las validaciones en paralelo
+    try {
+      await Promise.all(validationPromises);
+    } catch (validationError) {
+      return res.status(400).json({ message: validationError.message });
+    }
+
+    // Preparar objeto de actualización
+    const updateData = {};
+    if (name) updateData.name = name.trim();
+    if (email) updateData.email = email.trim().toLowerCase();
+    if (rol) updateData.rol = rol;
+    if (disabled !== undefined) updateData.disabled = disabled;
+    if (company !== undefined) updateData.company = company || undefined;
+    if (area !== undefined) updateData.area = area || undefined;
+    if (bossesInput !== undefined) updateData.bosses = bossesList;
     
     if (password) {
       const salt = await bcrypt.genSalt(10);
-      user.password = await bcrypt.hash(password, salt);
+      updateData.password = await bcrypt.hash(password, salt);
     }
 
-    await user.save();
+    // Usar findByIdAndUpdate para mejor rendimiento
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      updateData,
+      { new: true, runValidators: true }
+    ).select('-password -token').lean();
 
-    const userResponse = user.toObject();
-    delete userResponse.password;
-    delete userResponse.token;
-
-    console.log("✅ Usuario actualizado:", userResponse);
+    console.log("✅ Usuario actualizado:", updatedUser);
     return res.status(200).json({
       message: "Usuario actualizado exitosamente",
-      data: userResponse
+      data: updatedUser
     });
   } catch (error) {
     console.error("❌ Error al actualizar usuario:", error.message);
@@ -266,36 +293,14 @@ export const updateUser = async (req, res) => {
   }
 };
 
-// Eliminar un usuario
-export const deleteUser = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const user = await User.findByIdAndDelete(id);
-    
-    if (!user) {
-      return res.status(404).json({ message: "Usuario no encontrado" });
-    }
-
-    console.log("✅ Usuario eliminado:", user.email);
-    return res.status(200).json({
-      message: "Usuario eliminado exitosamente",
-      data: { id: user._id, email: user.email }
-    });
-  } catch (error) {
-    console.error("❌ Error al eliminar usuario:", error.message);
-    return res.status(500).json({ message: "Error al eliminar usuario" });
-  }
-};
-
 export const registerUser = async (req, res) => {
   // Extraer datos del cuerpo de la solicitud
   const { name, email, password } = req.body;
 
-  res.send({
-    message: "Datos recibidos para registro:",
-    data: { name, email, password },
-  });
+  // res.send({
+  //   message: "Datos recibidos para registro:",
+  //   data: { name, email, password },
+  // });
   // Crear un nuevo usuario
   try {
     const newUser = new User({ name, email, password });
@@ -323,9 +328,6 @@ export const registerUser = async (req, res) => {
 };
 
 export const loginUser = async (req, res) => {
-  console.log("📨 req.body recibido:", req.body);
-  console.log("📨 Tipo de req.body:", typeof req.body);
-
   const { email, password } = req.body;
 
   try {

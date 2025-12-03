@@ -20,7 +20,7 @@ export const requirePermissionNew = (section, permission) => {
       }
 
       // Verificar permiso usando el nuevo sistema de base de datos
-      const hasPermissionDB = await PermissionService.hasPermission(user._id, section, permission);
+      const hasPermissionDB = await PermissionService.hasPermission(user.id, section, permission);
       
       if (!hasPermissionDB) {
         return res.status(403).json({

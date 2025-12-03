@@ -18,7 +18,7 @@ interface PublicRouteProps {
  *   <LoginPage />
  * </PublicRoute>
  */
-export const PublicRoute: React.FC<PublicRouteProps> = ({ children }) => {
+export const PublicRoute = ({ children }: PublicRouteProps) => {
   const { auth, loading } = useContext(AuthContext);
 
   // Si está cargando, mostrar un loader

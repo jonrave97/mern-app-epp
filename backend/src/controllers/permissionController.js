@@ -46,6 +46,28 @@ class PermissionController {
   }
 
   /**
+   * Obtiene los permisos del usuario autenticado (para el hook usePermissions)
+   */
+  static async getMyPermissions(req, res) {
+    try {
+      const userId = req.user.id; // ID del usuario autenticado
+      const permissions = await PermissionService.getUserPermissions(userId);
+      
+      res.json({
+        success: true,
+        permissions: permissions.permissions,
+        lastModified: permissions.updatedAt
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: 'Error al obtener permisos',
+        error: error.message
+      });
+    }
+  }
+
+  /**
    * Actualiza los permisos de un usuario
    */
   static async updateUserPermissions(req, res) {

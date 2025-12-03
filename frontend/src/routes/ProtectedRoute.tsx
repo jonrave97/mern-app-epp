@@ -24,7 +24,7 @@ interface ProtectedRouteProps {
  *   <UserManagement />
  * </ProtectedRoute>
  */
-export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole }) => {
+export const ProtectedRoute= ({ children, requiredRole }: ProtectedRouteProps) => {
   const { auth, loading } = useContext(AuthContext);
 
   // Si está cargando, mostrar un loader

@@ -108,6 +108,18 @@ const userSchema = new mongoose.Schema({
     timestamps: true // Agrega campos createdAt y updatedAt automáticamente
 });
 
+// Índices para optimizar consultas frecuentes
+// Nota: email ya tiene índice único automático por 'unique: true'
+userSchema.index({ rol: 1 }); // Para filtrar por rol (ej: Jefatura)
+userSchema.index({ disabled: 1 }); // Para filtrar activos/inactivos
+userSchema.index({ name: 1 }); // Para búsquedas por nombre
+userSchema.index({ company: 1 }); // Para filtrar por empresa
+userSchema.index({ area: 1 }); // Para filtrar por área
+userSchema.index({ createdAt: -1 }); // Para ordenar por fecha de creación
+// Índice compuesto para búsquedas combinadas
+userSchema.index({ rol: 1, disabled: 1 });
+userSchema.index({ name: 'text', email: 'text' }); // Índice de texto para búsqueda full-text
+
 const User = mongoose.model("User", userSchema);
 
 export default User;

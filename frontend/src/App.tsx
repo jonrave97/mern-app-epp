@@ -1,23 +1,28 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import { ProtectedRoute } from "./routes/ProtectedRoute";
 import { PublicRoute } from "./routes/PublicRoute";
 import NotFoundPage from "./pages/common/NotFoundPage.tsx";
 import LoginPage from "./pages/auth/LoginPage.tsx";
 import AdminRoutes from "./routes/AdminRoutes.tsx"; // Rutas específicas para el área de administración
+import UserRoutes from "./routes/UserRoutes.tsx"; // Rutas específicas para usuarios comunes
+import RoleBasedRoute from "./routes/RoleBasedRoute.tsx"; // Redirección basada en rol
 import ForgotPassword from "./pages/auth/ForgotPasswordPage.tsx";
 
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
+    <ErrorBoundary>
+      <AuthProvider>
+        <BrowserRouter>
         {/* Aquí podrían ir otros componentes comunes, como un header */}
         <Routes>
+          {/* Ruta raíz - redirige según el rol del usuario */}
           <Route
             path="/"
             element={
               <ProtectedRoute>
-                <Navigate to="/admin/dashboard" replace />
+                <RoleBasedRoute />
               </ProtectedRoute>
             }
           />
@@ -29,7 +34,13 @@ function App() {
               </PublicRoute>
             }
           />
+          
+          {/* Rutas de administrador */}
           <Route path="/admin/*" element={<AdminRoutes />} />
+          
+          {/* Rutas de usuario común */}
+          <Route path="/user/*" element={<UserRoutes />} />
+          
           <Route
             path="/forgot-password"
             element={
@@ -43,7 +54,8 @@ function App() {
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </BrowserRouter>
-    </AuthProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 export default App;
